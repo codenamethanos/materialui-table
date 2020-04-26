@@ -1,22 +1,35 @@
 {
-  "name": "materialui-table",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.5.0",
-    "@testing-library/user-event": "^7.2.1",
+  "name": "thanos-datatable",
+  "version": "1.0.0",
+  "description": "A datatable using materialui",
+  "author": "codenamethanos",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "codenamethanos/materialui-table"
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "files": ["dist"],   
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/preset-react": "^7.9.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1"
   },
+  "dependencies": {
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.5.0",
+    "@testing-library/user-event": "^7.2.1"
+  },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "rm -rf dist && NODE_ENV=production babel src/lib --out-dir dist --copy-files --ignore __tests__,spec.js,test.js,__snapshots__",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
-  "eslintConfig": {
+  "eslintConfig": { 
     "extends": "react-app"
   },
   "browserslist": {
