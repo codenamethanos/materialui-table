@@ -1,10 +1,17 @@
-import React from 'react'
+import React from 'react';
+import FirstComponent, { SecondComponent } from 'materialui-table';
 
-import { ExampleComponent } from 'materialui-table'
-import 'materialui-table/dist/index.css'
-
-const App = () => {
-  return <ExampleComponent text="Create React Library Example 😄" />
+const App = () => { 
+  return <>
+          <FirstComponent 
+            text="Create React Library Example 😄" 
+            color="green"
+          />
+          <SecondComponent 
+            text="Create Second Library Example 😄" 
+            color="red"
+          />
+        </>
 }
 
 export default App

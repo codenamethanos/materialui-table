@@ -1,6 +1,11 @@
-import React from 'react'
-import styles from './styles.module.css'
+import React from 'react';
 
-export const ExampleComponent = ({ text }) => {
-  return <div className={styles.test}>Example Component: {text}</div>
+const FirstComponent = ({ text, color }) => {
+  return <h1 style={{color}}>Example Component: {text}</h1>
+}
+
+export default FirstComponent;
+ 
+export const SecondComponent = ({ text, color }) => {
+  return <h1 style={{color}}>Example Component: {text}</h1>
 }
