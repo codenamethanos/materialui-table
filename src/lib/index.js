@@ -1,5 +1,5 @@
 import ThanosTable from './components/ThanosTable';
-import TextInput from "./components/TextInput";
+import ThanosTableMain from "./components/ThanosTableMain";
 
 export default ThanosTable;
-export { TextInput };
+export { ThanosTableMain };

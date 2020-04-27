@@ -32,37 +32,36 @@ var useStyles = (0, _styles.makeStyles)({
 });
 
 function ThanosTable(_ref) {
-  var rows = _ref.rows;
+  var columns = _ref.columns,
+      rows = _ref.rows;
   var classes = useStyles();
+  var tableColumns = [];
+  var tableRows = [];
+  var tableCells = [];
+  var keyArray = [];
+
+  if (columns && columns.length > 0) {
+    tableColumns = columns.map(function (column) {
+      keyArray.push(column['key']);
+      return /*#__PURE__*/_react.default.createElement(_TableCell.default, null, column['value']);
+    });
+
+    if (tableColumns && tableColumns.length > 0 && keyArray && keyArray.length > 0 && rows && rows.length > 0) {
+      tableRows = rows.map(function (row) {
+        tableCells = [];
+        tableCells = keyArray.map(function (key) {
+          return /*#__PURE__*/_react.default.createElement(_TableCell.default, null, row[key]);
+        });
+        return /*#__PURE__*/_react.default.createElement(_TableRow.default, null, tableCells);
+      });
+    }
+  }
+
   return /*#__PURE__*/_react.default.createElement(_TableContainer.default, {
     component: _Paper.default
   }, /*#__PURE__*/_react.default.createElement(_Table.default, {
-    className: classes.table,
-    "aria-label": "simple table"
-  }, /*#__PURE__*/_react.default.createElement(_TableHead.default, null, /*#__PURE__*/_react.default.createElement(_TableRow.default, null, /*#__PURE__*/_react.default.createElement(_TableCell.default, null, "Dessert (100g serving)"), /*#__PURE__*/_react.default.createElement(_TableCell.default, {
-    align: "right"
-  }, "Calories"), /*#__PURE__*/_react.default.createElement(_TableCell.default, {
-    align: "right"
-  }, "Fat\xA0(g)"), /*#__PURE__*/_react.default.createElement(_TableCell.default, {
-    align: "right"
-  }, "Carbs\xA0(g)"), /*#__PURE__*/_react.default.createElement(_TableCell.default, {
-    align: "right"
-  }, "Protein\xA0(g)"))), /*#__PURE__*/_react.default.createElement(_TableBody.default, null, rows.map(function (row) {
-    return /*#__PURE__*/_react.default.createElement(_TableRow.default, {
-      key: row.name
-    }, /*#__PURE__*/_react.default.createElement(_TableCell.default, {
-      component: "th",
-      scope: "row"
-    }, row.name), /*#__PURE__*/_react.default.createElement(_TableCell.default, {
-      align: "right"
-    }, row.calories), /*#__PURE__*/_react.default.createElement(_TableCell.default, {
-      align: "right"
-    }, row.fat), /*#__PURE__*/_react.default.createElement(_TableCell.default, {
-      align: "right"
-    }, row.carbs), /*#__PURE__*/_react.default.createElement(_TableCell.default, {
-      align: "right"
-    }, row.protein));
-  }))));
+    className: classes.table
+  }, /*#__PURE__*/_react.default.createElement(_TableHead.default, null, /*#__PURE__*/_react.default.createElement(_TableRow.default, null, tableColumns)), /*#__PURE__*/_react.default.createElement(_TableBody.default, null, tableRows)));
 }
 
 var _default = ThanosTable;

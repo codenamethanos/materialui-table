@@ -15,34 +15,52 @@ const useStyles = makeStyles({
   });
   
 
-function ThanosTable({ rows }) {
+function ThanosTable({ columns, rows }) {
     const classes = useStyles();
+
+    let tableColumns = [];
+    let tableRows = [];
+    let tableCells = [];
+    let keyArray = [];
+
+    if(columns && columns.length > 0) {
+        tableColumns = columns.map((column) => {
+            keyArray.push(column['key']);
+            return (
+                <TableCell>{column['value']}</TableCell>
+            )
+        });
+
+        if(tableColumns && tableColumns.length > 0 && 
+            keyArray && keyArray.length > 0 &&
+            rows && rows.length > 0) {
+                tableRows = rows.map((row) => {
+                    tableCells = [];
+                    tableCells = keyArray.map((key) => (
+                        <TableCell>{row[key]}</TableCell>
+                    ));
+                    return (
+                        <TableRow>
+                            {tableCells}
+                        </TableRow>
+                    )
+                });
+        }
+
+    }
+
     return (
         <TableContainer component={Paper}>
-        <Table className={classes.table} aria-label="simple table">
-            <TableHead>
-            <TableRow>
-                <TableCell>Dessert (100g serving)</TableCell>
-                <TableCell align="right">Calories</TableCell>
-                <TableCell align="right">Fat&nbsp;(g)</TableCell>
-                <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-                <TableCell align="right">Protein&nbsp;(g)</TableCell>
-            </TableRow>
-            </TableHead>
-            <TableBody>
-            {rows.map((row) => (
-                <TableRow key={row.name}>
-                <TableCell component="th" scope="row">
-                    {row.name}
-                </TableCell>
-                <TableCell align="right">{row.calories}</TableCell>
-                <TableCell align="right">{row.fat}</TableCell>
-                <TableCell align="right">{row.carbs}</TableCell>
-                <TableCell align="right">{row.protein}</TableCell>
-                </TableRow>
-            ))}
-            </TableBody>
-        </Table>
+            <Table className={classes.table}>
+                <TableHead>
+                    <TableRow>
+                        {tableColumns}
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {tableRows}
+                </TableBody>
+            </Table>
         </TableContainer>
     );
 }
