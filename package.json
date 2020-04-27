@@ -10,9 +10,18 @@
   },
   "main": "dist/index.js",
   "module": "dist/index.js",
-  "files": ["dist"],   
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.5",
     "@babel/preset-react": "^7.9.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -25,11 +34,11 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "rm -rf dist && NODE_ENV=production babel src/lib --out-dir dist --copy-files --ignore __tests__,spec.js,test.js,__snapshots__",
+    "build": "rm -rf dist && npx babel src/lib --out-dir dist --copy-files",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
-  "eslintConfig": { 
+  "eslintConfig": {
     "extends": "react-app"
   },
   "browserslist": {

@@ -1,4 +1,4 @@
 # simple-component-library
-A library of React components created using `create-react-app`.## Installation
+A library of React components for a light React Datatable using materialui
 Run the following command:
 `npm install thanos-datatable`
