@@ -25,7 +25,6 @@ function ThanosTableHead(props) {
       order = props.order,
       orderBy = props.orderBy,
       onRequestSort = props.onRequestSort;
-  var tableColumns = [];
 
   var createSortHandler = function createSortHandler(property) {
     return function (event) {
@@ -33,22 +32,16 @@ function ThanosTableHead(props) {
     };
   };
 
-  if (columns && columns.length > 0) {
-    tableColumns = columns.map(function (column) {
-      return /*#__PURE__*/_react.default.createElement(_TableCell.default, {
-        key: column['key'],
-        sortDirection: orderBy === column['key'] ? order : false
-      }, /*#__PURE__*/_react.default.createElement(_TableSortLabel.default, {
-        active: orderBy === column['key'],
-        direction: orderBy === column['key'] ? order : 'asc',
-        onClick: createSortHandler(column['key'])
-      }, column['value'], orderBy === column['key'] ? /*#__PURE__*/_react.default.createElement("span", {
-        className: classes.visuallyHidden
-      }, order === 'desc' ? 'sorted descending' : 'sorted ascending') : null));
-    });
-  }
-
-  return /*#__PURE__*/_react.default.createElement(_TableHead.default, null, /*#__PURE__*/_react.default.createElement(_core.TableRow, null, tableColumns));
+  return /*#__PURE__*/_react.default.createElement(_TableHead.default, null, /*#__PURE__*/_react.default.createElement(_core.TableRow, null, columns.map(function (column) {
+    return /*#__PURE__*/_react.default.createElement(_TableCell.default, {
+      key: column['key'],
+      sortDirection: !orderBy && orderBy.length === 0 && column.defaultSort ? column.defaultSort : orderBy === column['key'] ? order : false
+    }, /*#__PURE__*/_react.default.createElement(_TableSortLabel.default, {
+      active: !orderBy && orderBy.length === 0 && column.defaultSort || orderBy === column['key'],
+      direction: !orderBy && orderBy.length === 0 && column.defaultSort ? column.defaultSort : orderBy === column['key'] ? order : 'asc',
+      onClick: createSortHandler(column['key'])
+    }, column['title']));
+  })));
 }
 
 ThanosTableHead.propTypes = {

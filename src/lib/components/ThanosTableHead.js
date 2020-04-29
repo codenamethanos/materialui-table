@@ -14,40 +14,29 @@ function ThanosTableHead(props) {
         onRequestSort 
     } = props;
 
-    let tableColumns = [];
-
     const createSortHandler = (property) => (event) => {
         onRequestSort(event, property);
     };
 
-    if(columns && columns.length > 0) {
-        tableColumns = columns.map((column) => {
-            return (
-                <TableCell
-                    key={column['key']}
-                    sortDirection={orderBy === column['key'] ? order : false}
-                >
-                    <TableSortLabel
-                        active={orderBy === column['key']}
-                        direction={orderBy === column['key'] ? order : 'asc'}
-                        onClick={createSortHandler(column['key'])}
-                    >
-                        {column['value']}
-                        {orderBy === column['key'] ? (
-                            <span className={classes.visuallyHidden}>
-                                {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                            </span>
-                        ) : null}
-                    </TableSortLabel>
-                </TableCell>
-            );
-        });
-    }
-
     return (
         <TableHead>
             <TableRow>
-                {tableColumns}
+                {columns.map((column) => {
+                    return (
+                        <TableCell
+                            key={column['key']} 
+                            sortDirection={(!orderBy && orderBy.length === 0 && column.defaultSort) ? column.defaultSort : (orderBy === column['key'] ? order : false)}
+                        >
+                            <TableSortLabel
+                                active={(!orderBy && orderBy.length === 0 && column.defaultSort) || (orderBy === column['key'])}
+                                direction={(!orderBy && orderBy.length === 0 && column.defaultSort) ? column.defaultSort : (orderBy === column['key'] ? order : 'asc')}
+                                onClick={createSortHandler(column['key'])}
+                            >
+                                {column['title']}
+                            </TableSortLabel>
+                        </TableCell>
+                    );
+                })}
             </TableRow>
         </TableHead>
     );

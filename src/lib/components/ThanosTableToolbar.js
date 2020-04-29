@@ -1,7 +1,7 @@
 
 import React from 'react';
 import clsx from 'clsx';
-import Toolbar from '@material-ui/core/Toolbar';
+import Toolbar from '@material-ui/core/Toolbar'; 
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import FilterListIcon from '@material-ui/icons/FilterList';
@@ -18,7 +18,7 @@ const useToolbarStyles = makeStyles((theme) => ({
     },
 }));
   
-function ThanosTableToolbar(props) {
+function ThanosTableToolbar({ title }) {
     const classes = useToolbarStyles();
 
     return (
@@ -26,7 +26,7 @@ function ThanosTableToolbar(props) {
             className={clsx(classes.root)}
         >
             <Typography className={classes.title} variant="h6" id="tableTitle" component="div">
-                Nutrition
+                { title }
             </Typography>
             <Tooltip title="Filter list">
                 <IconButton aria-label="filter list">

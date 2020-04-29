@@ -35,7 +35,8 @@ var useToolbarStyles = (0, _styles.makeStyles)(function (theme) {
   };
 });
 
-function ThanosTableToolbar(props) {
+function ThanosTableToolbar(_ref) {
+  var title = _ref.title;
   var classes = useToolbarStyles();
   return /*#__PURE__*/_react.default.createElement(_Toolbar.default, {
     className: (0, _clsx.default)(classes.root)
@@ -44,7 +45,7 @@ function ThanosTableToolbar(props) {
     variant: "h6",
     id: "tableTitle",
     component: "div"
-  }, "Nutrition"), /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+  }, title), /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
     title: "Filter list"
   }, /*#__PURE__*/_react.default.createElement(_IconButton.default, {
     "aria-label": "filter list"
