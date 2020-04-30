@@ -21,9 +21,10 @@ function ThanosTableHead(props) {
     return (
         <TableHead>
             <TableRow>
-                {columns.map((column) => {
+                {columns.map((column, index) => {
                     return (
                         <TableCell
+                            classes={{ head: ((index === 0) ? (classes.headerStyleLeftFixed) : (classes.headerCellStyle)) }}
                             key={column['key']} 
                             sortDirection={(!orderBy && orderBy.length === 0 && column.defaultSort) ? column.defaultSort : (orderBy === column['key'] ? order : false)}
                         >
@@ -49,4 +50,4 @@ ThanosTableHead.propTypes = {
     orderBy: PropTypes.string.isRequired
 };
 
-export default ThanosTableHead;
+export default ThanosTableHead; 

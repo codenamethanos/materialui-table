@@ -47,6 +47,12 @@ function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 var useStyles = (0, _styles.makeStyles)(function (theme) {
   return {
     root: {
@@ -57,9 +63,55 @@ var useStyles = (0, _styles.makeStyles)(function (theme) {
       marginBottom: theme.spacing(2)
     },
     table: {
-      minWidth: 750
+      minWidth: 750,
+      borderCollapse: 'collapse'
+    },
+    container: function container(options) {
+      return {
+        maxHeight: options.maxTableHeight
+      };
+    },
+    headerCellStyle: function headerCellStyle(options) {
+      return _objectSpread({
+        backgroundColor: '#fff'
+      }, options.headerCellStyle, {}, options.stickyHeader && {
+        position: 'sticky',
+        top: 0,
+        zIndex: 100
+      }, {
+        minWidth: options.minCellWidth
+      });
+    },
+    headerStyleLeftFixed: function headerStyleLeftFixed(options) {
+      return _objectSpread({
+        backgroundColor: '#fff'
+      }, options.headerCellStyle, {}, options.stickyColumn && {
+        position: 'sticky',
+        left: 0,
+        zIndex: 110
+      }, {}, options.stickyHeader && {
+        position: 'sticky',
+        top: 0,
+        zIndex: 110
+      }, {
+        minWidth: options.minCellWidth
+      });
     }
   };
+});
+var styles = {
+  cellStyle: function cellStyle(props) {
+    return props.cellStyle;
+  }
+};
+var StyledTableCell = (0, _styles.withStyles)(styles)(function (_ref) {
+  var classes = _ref.classes,
+      children = _ref.children;
+  return /*#__PURE__*/_react.default.createElement(_TableCell.default, {
+    classes: {
+      root: classes.cellStyle
+    }
+  }, children);
 });
 
 function descendingComparator(a, b, orderBy, keyObject) {
@@ -109,11 +161,11 @@ function stableSort(array, comparator) {
   });
 }
 
-function ThanosTable(_ref) {
-  var columns = _ref.columns,
-      rows = _ref.rows,
-      options = _ref.options;
-  var classes = useStyles();
+function ThanosTable(_ref2) {
+  var columns = _ref2.columns,
+      rows = _ref2.rows,
+      options = _ref2.options;
+  var classes = useStyles(options);
 
   var _useState = (0, _react.useState)('asc'),
       _useState2 = _slicedToArray(_useState, 2),
@@ -196,7 +248,9 @@ function ThanosTable(_ref) {
     className: classes.paper
   }, /*#__PURE__*/_react.default.createElement(_ThanosTableToolbar.default, {
     title: options.title || ''
-  }), /*#__PURE__*/_react.default.createElement(_TableContainer.default, null, /*#__PURE__*/_react.default.createElement(_Table.default, {
+  }), /*#__PURE__*/_react.default.createElement(_TableContainer.default, {
+    className: classes.container
+  }, /*#__PURE__*/_react.default.createElement(_Table.default, {
     className: classes.table,
     "aria-labelledby": "tableTitle",
     "aria-label": "enhanced table"
@@ -206,9 +260,27 @@ function ThanosTable(_ref) {
     order: order,
     orderBy: orderBy,
     onRequestSort: handleRequestSort
-  }), /*#__PURE__*/_react.default.createElement(_TableBody.default, null, sortedFirstPageRow.map(function (row, index) {
-    return /*#__PURE__*/_react.default.createElement(_TableRow.default, null, columns.map(function (column) {
-      return /*#__PURE__*/_react.default.createElement(_TableCell.default, null, column.key && !column.customValue ? row[column.key] : column.customValue(row));
+  }), /*#__PURE__*/_react.default.createElement(_TableBody.default, null, sortedFirstPageRow.map(function (row) {
+    return /*#__PURE__*/_react.default.createElement(_TableRow.default, null, columns.map(function (column, index) {
+      return /*#__PURE__*/_react.default.createElement(StyledTableCell, {
+        cellStyle: column.key && column.columnCellStyle ? _objectSpread({
+          backgroundColor: '#fff'
+        }, column.columnCellStyle(row), {}, options.stickyColumn && index === 0 && {
+          position: 'sticky',
+          left: 0,
+          zIndex: 90
+        }, {
+          minWidth: column.minColWidth || options.minCellWidth
+        }) : _objectSpread({
+          backgroundColor: '#fff'
+        }, options.rowCellStyle, {}, options.stickyColumn && index === 0 && {
+          position: 'sticky',
+          left: 0,
+          zIndex: 90
+        }, {
+          minWidth: column.minColWidth || options.minCellWidth
+        })
+      }, column.key && !column.customValue ? row[column.key] : column.customValue(row));
     }));
   }), emptyRows > 0 && options.showEmptyRows && /*#__PURE__*/_react.default.createElement(_TableRow.default, {
     style: {
@@ -216,8 +288,34 @@ function ThanosTable(_ref) {
     }
   }, /*#__PURE__*/_react.default.createElement(_TableCell.default, {
     colSpan: 6
-  })), /*#__PURE__*/_react.default.createElement(_TableRow.default, null, columns.map(function (column) {
-    return /*#__PURE__*/_react.default.createElement(_TableCell.default, null, column.key && !column.customValue ? totalRow[column.key] : column.customValue(totalRow));
+  })), /*#__PURE__*/_react.default.createElement(_TableRow.default, null, columns.map(function (column, index) {
+    return /*#__PURE__*/_react.default.createElement(StyledTableCell, {
+      cellStyle: column.key && column.columnCellStyle && !column.footerStylePriority ? _objectSpread({
+        backgroundColor: '#fff'
+      }, column.columnCellStyle(totalRow), {}, options.stickyFooter && {
+        position: 'sticky',
+        bottom: 0,
+        zIndex: 100
+      }, {}, options.stickyColumn && index === 0 && {
+        position: 'sticky',
+        left: 0,
+        zIndex: 110
+      }, {
+        minWidth: column.minColWidth || options.minCellWidth
+      }) : _objectSpread({
+        backgroundColor: '#fff'
+      }, options.footerCellStyle, {}, options.stickyFooter && {
+        position: 'sticky',
+        bottom: 0,
+        zIndex: 100
+      }, {}, options.stickyColumn && index === 0 && {
+        position: 'sticky',
+        left: 0,
+        zIndex: 110
+      }, {
+        minWidth: column.minColWidth || options.minCellWidth
+      })
+    }, column.key && !column.customValue ? totalRow[column.key] : column.customValue(totalRow));
   }))))), /*#__PURE__*/_react.default.createElement(_TablePagination.default, {
     rowsPerPageOptions: options.pageOptions || [5, 10, 25],
     component: "div",

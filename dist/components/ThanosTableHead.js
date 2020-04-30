@@ -32,8 +32,11 @@ function ThanosTableHead(props) {
     };
   };
 
-  return /*#__PURE__*/_react.default.createElement(_TableHead.default, null, /*#__PURE__*/_react.default.createElement(_core.TableRow, null, columns.map(function (column) {
+  return /*#__PURE__*/_react.default.createElement(_TableHead.default, null, /*#__PURE__*/_react.default.createElement(_core.TableRow, null, columns.map(function (column, index) {
     return /*#__PURE__*/_react.default.createElement(_TableCell.default, {
+      classes: {
+        head: index === 0 ? classes.headerStyleLeftFixed : classes.headerCellStyle
+      },
       key: column['key'],
       sortDirection: !orderBy && orderBy.length === 0 && column.defaultSort ? column.defaultSort : orderBy === column['key'] ? order : false
     }, /*#__PURE__*/_react.default.createElement(_TableSortLabel.default, {

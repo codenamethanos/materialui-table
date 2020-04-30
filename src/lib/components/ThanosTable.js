@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -20,8 +20,37 @@ const useStyles = makeStyles((theme) => ({
     },
     table: {
       minWidth: 750,
-    }
+      borderCollapse: 'collapse'
+    },
+    container: options => ({
+      maxHeight: options.maxTableHeight
+    }),
+    headerCellStyle: options => ({
+      backgroundColor: '#fff',
+      ...options.headerCellStyle, 
+      ...(options.stickyHeader && {position: 'sticky', top: 0, zIndex: 100}), 
+      minWidth: options.minCellWidth
+    }),
+    headerStyleLeftFixed: options => ({
+      backgroundColor: '#fff',
+      ...options.headerCellStyle, 
+      ...(options.stickyColumn && {position: 'sticky', left: 0, zIndex: 110}),
+      ...(options.stickyHeader && {position: 'sticky', top: 0, zIndex: 110}), 
+      minWidth: options.minCellWidth
+    })
 }));
+
+const styles = {
+  cellStyle: props => (props.cellStyle)
+};
+
+const StyledTableCell = withStyles(styles)(({classes, children}) => {
+  return(
+    <TableCell classes={{ root: classes.cellStyle }}>
+      {children}
+    </TableCell>
+  );
+});
 
 function descendingComparator(a, b, orderBy, keyObject) {
     // If the orderBy key has a customSort, use customSort(b) instead of b[orderBy]
@@ -61,7 +90,7 @@ function stableSort (array, comparator) {
 }
 
 function ThanosTable({ columns, rows, options }) {
-  const classes = useStyles();
+  const classes = useStyles(options);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('');
   const [page, setPage] = useState(options.defaultPage || 0);
@@ -119,7 +148,7 @@ function ThanosTable({ columns, rows, options }) {
         else {
           totalRow[columns[j]['key']] = '';
         }
-      }
+      } 
     }
   }
 
@@ -127,8 +156,8 @@ function ThanosTable({ columns, rows, options }) {
     <div className={classes.root}>
         <Paper className={classes.paper}>
             <ThanosTableToolbar title={options.title || ''} />
-            <TableContainer>
-                <Table 
+            <TableContainer className={classes.container}>
+                <Table
                     className={classes.table}
                     aria-labelledby="tableTitle"
                     aria-label="enhanced table"
@@ -141,11 +170,20 @@ function ThanosTable({ columns, rows, options }) {
                         onRequestSort={handleRequestSort}
                     />
                     <TableBody> 
-                        {sortedFirstPageRow.map((row, index) => {
+                        {sortedFirstPageRow.map((row) => {
                           return (
                             <TableRow>
-                              {columns.map((column) => (
-                                <TableCell>{(column.key && !column.customValue) ? (row[column.key]) : column.customValue(row) }</TableCell>
+                              {columns.map((column, index) => (
+                                <StyledTableCell cellStyle={(column.key && column.columnCellStyle) 
+                                                 ? ({backgroundColor: '#fff', ...column.columnCellStyle(row), 
+                                                    ...(options.stickyColumn && (index === 0) && {position: 'sticky', left: 0, zIndex: 90}),
+                                                    minWidth: (column.minColWidth || options.minCellWidth)}) 
+                                                 : ({backgroundColor: '#fff', ...options.rowCellStyle, 
+                                                    ...(options.stickyColumn && (index === 0) && {position: 'sticky', left: 0, zIndex: 90}),
+                                                    minWidth: (column.minColWidth || options.minCellWidth)})}
+                                >
+                                  {(column.key && !column.customValue) ? (row[column.key]) : column.customValue(row) }
+                                </StyledTableCell>
                               ))}
                             </TableRow>
                           );
@@ -156,8 +194,19 @@ function ThanosTable({ columns, rows, options }) {
                             </TableRow>
                         )}
                         <TableRow>
-                            {columns.map((column) => ( 
-                              <TableCell>{(column.key && !column.customValue) ? totalRow[column.key] : column.customValue(totalRow) }</TableCell>
+                            {columns.map((column, index) => ( 
+                              <StyledTableCell cellStyle={(column.key && column.columnCellStyle && !column.footerStylePriority) 
+                                               ? ({backgroundColor: '#fff', ...column.columnCellStyle(totalRow), 
+                                                 ...(options.stickyFooter && {position: 'sticky', bottom: 0, zIndex: 100}), 
+                                                 ...(options.stickyColumn && (index === 0) && {position: 'sticky', left: 0, zIndex: 110}),
+                                                 minWidth: (column.minColWidth || options.minCellWidth)}) 
+                                               : ({backgroundColor: '#fff', ...options.footerCellStyle, 
+                                                 ...(options.stickyFooter && {position: 'sticky', bottom: 0, zIndex: 100}), 
+                                                 ...(options.stickyColumn && (index === 0) && {position: 'sticky', left: 0, zIndex: 110}),
+                                                 minWidth: (column.minColWidth || options.minCellWidth)})}
+                              >
+                                {(column.key && !column.customValue) ? totalRow[column.key] : column.customValue(totalRow) }
+                              </StyledTableCell>
                             ))}
                         </TableRow>
                     </TableBody>
