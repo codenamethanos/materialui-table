@@ -26,11 +26,15 @@ function ThanosTableHead(props) {
                         <TableCell
                             classes={{ head: ((index === 0) ? (classes.headerStyleLeftFixed) : (classes.headerCellStyle)) }}
                             key={column['key']} 
-                            sortDirection={(!orderBy && orderBy.length === 0 && column.defaultSort) ? column.defaultSort : (orderBy === column['key'] ? order : false)}
+                            sortDirection={(!orderBy && (orderBy.length === 0) && column.defaultSort) 
+                                ? column.defaultSort 
+                                : (orderBy === column['key'] ? order : false)}
                         >
                             <TableSortLabel
-                                active={(!orderBy && orderBy.length === 0 && column.defaultSort) || (orderBy === column['key'])}
-                                direction={(!orderBy && orderBy.length === 0 && column.defaultSort) ? column.defaultSort : (orderBy === column['key'] ? order : 'asc')}
+                                active={(!orderBy && (orderBy.length === 0) && column.defaultSort) || (orderBy === column['key'])}
+                                direction={(!orderBy && (orderBy.length === 0) && column.defaultSort) 
+                                    ? column.defaultSort 
+                                    : (orderBy === column['key'] ? order : 'asc')}
                                 onClick={createSortHandler(column['key'])}
                             >
                                 {column['title']}

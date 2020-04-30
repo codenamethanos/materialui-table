@@ -187,6 +187,10 @@ function ThanosTable(_ref2) {
       rowsPerPage = _useState8[0],
       setRowsPerPage = _useState8[1];
 
+  var withDefaultOptions = _objectSpread({
+    totalRow: true
+  }, options);
+
   var handleRequestSort = function handleRequestSort(event, property) {
     var isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -221,22 +225,26 @@ function ThanosTable(_ref2) {
   var value = 0;
 
   if (columns && columns.length > 0 && sortedFirstPageRow && sortedFirstPageRow.length) {
-    for (var _i2 = 0, n1 = sortedFirstPageRow.length; _i2 < n1; _i2++) {
-      for (var j = 0, n2 = columns.length; j < n2; j++) {
-        if (columns[j].totalRowCellName) {
-          totalRow[columns[j]['key']] = columns[j].totalRowCellName;
-        } else if (columns[j].totalRow && !columns[j].customValue) {
-          // Use only column.totalRow if you want to add customValue directly in totalRow. Also check comment below. 
-          value = 0; // value = ((columns[j].key && !columns[j].customValue) ? (sortedFirstPageRow[i][columns[j].key]) : columns[j].customValue(sortedFirstPageRow[i])); // Use this if you want to add customValue directly in totalRow
+    if (withDefaultOptions.totalRow) {
+      for (var _i2 = 0, n1 = sortedFirstPageRow.length; _i2 < n1; _i2++) {
+        for (var j = 0, n2 = columns.length; j < n2; j++) {
+          // if(columns[j].totalRow) {
+          // if(columns[j].totalRowCellName) {
+          // if(i === 0) totalRow[columns[j]['key']] = columns[j].totalRowCellName; 
+          // }
+          // else {
+          if (!columns[j].customElement) {
+            value = 0;
+            value = Number(sortedFirstPageRow[_i2][columns[j].key]) || 0;
+            totalRow[columns[j]['key']] = totalRow[columns[j]['key']] ? totalRow[columns[j]['key']] + value : value;
+            if (_i2 === n1 - 1) totalRow[columns[j]['key']] = Math.round(totalRow[columns[j]['key']] * 1e12) / 1e12; // Math.round((totalRow[columns[j].key]) * 1e12) / 1e12 ... is used to protect against floating point decimal issue. (https://stackoverflow.com/questions/10473994/javascript-adding-decimal-numbers-issue)
+          } else {
+            if (_i2 === 0) totalRow[columns[j]['key']] = 0;
+          } // }
+          // } else {
+          // if(i === 0) totalRow[columns[j]['key']] = ''; 
+          // }
 
-          value = sortedFirstPageRow[_i2][columns[j].key];
-          totalRow[columns[j]['key']] = totalRow[columns[j]['key']] ? totalRow[columns[j]['key']] + value : value;
-          if (_i2 === n1 - 1) totalRow[columns[j]['key']] = Math.round(totalRow[columns[j]['key']] * 1e12) / 1e12; // Math.round((totalRow[columns[j].key]) * 1e12) / 1e12 ... is used to protect against floating point decimal issue. (https://stackoverflow.com/questions/10473994/javascript-adding-decimal-numbers-issue)
-        } else if (columns[j].totalRow && columns[j].customValue) {
-          value = 0;
-          totalRow[columns[j]['key']] = 0;
-        } else {
-          totalRow[columns[j]['key']] = '';
         }
       }
     }
@@ -280,7 +288,7 @@ function ThanosTable(_ref2) {
         }, {
           minWidth: column.minColWidth || options.minCellWidth
         })
-      }, column.key && !column.customValue ? row[column.key] : column.customValue(row));
+      }, column.key && !column.customElement ? row[column.key] : column.customElement(row));
     }));
   }), emptyRows > 0 && options.showEmptyRows && /*#__PURE__*/_react.default.createElement(_TableRow.default, {
     style: {
@@ -288,7 +296,8 @@ function ThanosTable(_ref2) {
     }
   }, /*#__PURE__*/_react.default.createElement(_TableCell.default, {
     colSpan: 6
-  })), /*#__PURE__*/_react.default.createElement(_TableRow.default, null, columns.map(function (column, index) {
+  })), /*#__PURE__*/_react.default.createElement(_TableRow.default, null, withDefaultOptions.totalRow ? columns.map(function (column, index) {
+    console.log(column);
     return /*#__PURE__*/_react.default.createElement(StyledTableCell, {
       cellStyle: column.key && column.columnCellStyle && !column.footerStylePriority ? _objectSpread({
         backgroundColor: '#fff'
@@ -315,8 +324,8 @@ function ThanosTable(_ref2) {
       }, {
         minWidth: column.minColWidth || options.minCellWidth
       })
-    }, column.key && !column.customValue ? totalRow[column.key] : column.customValue(totalRow));
-  }))))), /*#__PURE__*/_react.default.createElement(_TablePagination.default, {
+    }, column.key && column.totalRow ? column.totalRowCellName ? column.totalRowCellName : column.customElement ? column.customElement(totalRow) : totalRow[column.key] : null);
+  }) : null)))), /*#__PURE__*/_react.default.createElement(_TablePagination.default, {
     rowsPerPageOptions: options.pageOptions || [5, 10, 25],
     component: "div",
     count: rows.length,

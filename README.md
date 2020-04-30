@@ -1,7 +1,38 @@
 # Thanos Datatable
-A library of React components for a light React Datatable using materialui
-Run the following command:
-`npm install thanos-datatable`
+A library of React components for a light React Datatable using materialui.
+Run the following command: `npm install thanos-datatable`
+
+## Options
+| Key                           | Value Type (Default)          | Description                   |
+| ----------------------------- | ----------------------------- | ----------------------------- |
+| title                         | String                        | 'My Table'                    |
+| defaultPage                   | String                        | 'My Table'                    |
+| defaultRowsPerPage            | String                        | 'My Table'                    |
+| pageOptions                   | String                        | 'My Table'                    |
+| stickyHeader                  | String                        | 'My Table'                    |
+| stickyFooter                  | String                        | 'My Table'                    |
+| stickyColumn                  | String                        | 'My Table'                    |
+| showEmptyRows                 | String                        | 'My Table'                    |
+| totalRow                      | String                        | 'My Table'                    |
+| maxTableHeight                | String                        | 'My Table'                    |
+| minCellWidth                  | String                        | 'My Table'                    |
+| headerCellStyle               | String                        | 'My Table'                    |
+| rowCellStyle                  | String                        | 'My Table'                    |
+| footerCellStyle               | String                        | 'My Table'                    |
+
+## Columns
+| Key                           | Value Type (Default)          | Description                   |
+| ----------------------------- | ----------------------------- | ----------------------------- |
+| key                           | String                        | 'My Table'                    |
+| title                         | String                        | 'My Table'                    |
+| defaultSort                   | String                        | 'My Table'                    |
+| totalRowCellName              | String                        | 'My Table'                    |
+| minColWidth                   | String                        | 'My Table'                    |
+| totalRow                      | String                        | 'My Table'                    |
+| footerStylePriority           | String                        | 'My Table'                    |
+| customElement                 | String                        | 'My Table'                    |
+| customSort                    | String                        | 'My Table'                    |
+| columnCellStyle               | String                        | 'My Table'                    |
 
 ## Example Code
 

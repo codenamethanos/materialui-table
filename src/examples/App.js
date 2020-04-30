@@ -1,4 +1,6 @@
 import React from "react"; 
+import Link from '@material-ui/core/Link'; 
+import Button from '@material-ui/core/Button'; 
 import ThanosTable from "../lib";
 
 function App() {
@@ -28,7 +30,7 @@ function App() {
   // In customSort: Return numerical value if you want sorted numerically.
   // In customSort: Return string if you want sorted alphabetically.
   // totalRowCellName and totalRow cannot be together. If it happens, totalRowCellName takes preference.
-  // totalRow of customValue is also computed by the same equation returned in customValue.
+  // totalRow of customElement is also computed by the same equation returned in customElement.
   // columnCellStyle can be made to have lower/higher priority than footerCellStyle. Default is higher. 
   // minColWidth has higher priority than minCellWidth
   const columns = [
@@ -42,12 +44,48 @@ function App() {
     { key: 'fat', title: 'Fat', totalRow: true },
     { key: 'carbs', title: 'Carbs', totalRow: true },
     { key: 'protein', title: 'Protein', totalRow: true },
+    { key: 'link', 
+      title: 'Link',
+      totalRow: true,
+      customElement: function(row) {
+        return( 
+          <Link href={"/campaigns/"}>
+              {(row.fat + row.carbs + row.protein).toFixed(2)}
+          </Link>
+        );
+      }
+    },
+    { key: 'button', 
+      title: 'Button',
+      minColWidth: 300,
+      totalRow: false,
+      customElement: function(row) {
+        return(
+          <Button variant="contained">
+            {row.name}
+          </Button>
+        );
+      }
+    }, 
+    { key: 'img', 
+      title: 'Image',
+      minColWidth: 300,
+      totalRowCellName: 'Yo', // Does not work along with customElement
+      totalRow: true,
+      customElement: function(row) {
+        return(
+          <img alt='bannera' src={'https://allpiki.ru/wp-content/uploads/2020/01/1579269254_korzik_net_u-1-300x210.jpg'} style={{ width: 50, borderRadius: '10%' }} />
+        );
+      }
+    }, 
     { key: 'weight', 
       title: 'Weight', 
-      totalRow: true,
+      totalRow: false, // Does not work along with customElement. totalRow is printed anyway.
+      totalRowCellName: 'Yo',
       minColWidth: 300,
-      customValue: function(row) { 
-        return <div>{(row.fat + row.carbs + row.protein).toFixed(2)}</div>; // WOAH THINK ITS POSSIBLE TO RENDER ANYTHING LIKE COMPONENT AND LINKS HERE
+      customElement: function(row) { 
+        console.log(row);
+        return <div>{(row.fat + row.carbs + row.protein).toFixed(2)}</div>; 
       },
       customSort: function(row) { 
         return (row.fat + row.carbs + row.protein); 
@@ -71,19 +109,20 @@ function App() {
   ];
 
   const options = {
-    title: 'Test Table',
-    defaultPage: 0,
-    defaultRowsPerPage: 5,
-    pageOptions: [5, 10, 25, 50],
-    stickyHeader: true,
-    stickyFooter: true,
-    stickyColumn: true,
-    showEmptyRows: false,
-    maxTableHeight: 640,
-    minCellWidth: 100,
-    headerCellStyle: { fontWeight: 'bold' },
-    rowCellStyle: { backgroundColor: '#F2EEEE' },
-    footerCellStyle: { backgroundColor: '#3f51b5', color: 'white' }
+    title: 'Test Table', // Default is ''
+    defaultPage: 0, // Default is 0
+    defaultRowsPerPage: 5, // Default is 5
+    pageOptions: [5, 10, 25, 50], // Default is [5, 10, 25]
+    stickyHeader: true, // Default is false
+    stickyFooter: true, // Default is false
+    stickyColumn: true, // Default is false
+    showEmptyRows: false, // Default is false
+    totalRow: true, // Default is true
+    maxTableHeight: 640, // No default value, MaterialUI default applies
+    minCellWidth: 100, // No default value, MaterialUI default applies
+    headerCellStyle: { fontWeight: 'bold' }, // Default is { backgroundColor: '#fff' }
+    rowCellStyle: { backgroundColor: '#F2EEEE' }, // Default is { backgroundColor: '#fff' }
+    footerCellStyle: { backgroundColor: '#3f51b5', color: 'white' } // Default is { backgroundColor: '#fff' }
   };
 
   return( 

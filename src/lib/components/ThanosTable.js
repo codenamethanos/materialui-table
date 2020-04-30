@@ -95,6 +95,8 @@ function ThanosTable({ columns, rows, options }) {
   const [orderBy, setOrderBy] = useState('');
   const [page, setPage] = useState(options.defaultPage || 0);
   const [rowsPerPage, setRowsPerPage] = useState(options.defaultRowsPerPage || 5);
+
+  let withDefaultOptions = {totalRow: true, ...options};
   
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -116,7 +118,7 @@ function ThanosTable({ columns, rows, options }) {
   let keyObject = {};
   if(columns && columns.length > 0) { 
     for(let i=0, n=columns.length; i<n; i++) {
-      if(!orderBy && orderBy.length === 0 && columns[i].defaultSort) {
+      if(!orderBy && (orderBy.length === 0) && columns[i].defaultSort) {
         setOrder(columns[i].defaultSort);
         setOrderBy(columns[i]['key'])
       }
@@ -130,25 +132,29 @@ function ThanosTable({ columns, rows, options }) {
   let totalRow = {};
   let value = 0;
   if(columns && columns.length > 0 && sortedFirstPageRow && sortedFirstPageRow.length) { 
-    for(let i=0, n1=sortedFirstPageRow.length; i<n1; i++) {
-      for(let j=0, n2=columns.length; j<n2; j++) {
-        if(columns[j].totalRowCellName) {
-          totalRow[columns[j]['key']] = columns[j].totalRowCellName;
+    if(withDefaultOptions.totalRow) {
+      for(let i=0, n1=sortedFirstPageRow.length; i<n1; i++) {
+        for(let j=0, n2=columns.length; j<n2; j++) {
+          // if(columns[j].totalRow) {
+            // if(columns[j].totalRowCellName) {
+              // if(i === 0) totalRow[columns[j]['key']] = columns[j].totalRowCellName; 
+            // }
+            // else {
+              if(!columns[j].customElement) {
+                value = 0;
+                value = Number(sortedFirstPageRow[i][columns[j].key]) || 0; 
+                totalRow[columns[j]['key']] = (totalRow[columns[j]['key']] ? (totalRow[columns[j]['key']] + value) : value);
+                if(i === (n1-1)) totalRow[columns[j]['key']] = Math.round((totalRow[columns[j]['key']]) * 1e12) / 1e12 // Math.round((totalRow[columns[j].key]) * 1e12) / 1e12 ... is used to protect against floating point decimal issue. (https://stackoverflow.com/questions/10473994/javascript-adding-decimal-numbers-issue)
+              } else {
+                if(i === 0) totalRow[columns[j]['key']] = 0; 
+              }
+            // }
+          // } else {
+            // if(i === 0) totalRow[columns[j]['key']] = ''; 
+          // }
+
         } 
-        else if(columns[j].totalRow && !columns[j].customValue) { // Use only column.totalRow if you want to add customValue directly in totalRow. Also check comment below. 
-          value = 0;
-          // value = ((columns[j].key && !columns[j].customValue) ? (sortedFirstPageRow[i][columns[j].key]) : columns[j].customValue(sortedFirstPageRow[i])); // Use this if you want to add customValue directly in totalRow
-          value = sortedFirstPageRow[i][columns[j].key];
-          totalRow[columns[j]['key']] = (totalRow[columns[j]['key']] ? (totalRow[columns[j]['key']] + value) : value);
-          if(i === (n1-1)) totalRow[columns[j]['key']] = Math.round((totalRow[columns[j]['key']]) * 1e12) / 1e12 // Math.round((totalRow[columns[j].key]) * 1e12) / 1e12 ... is used to protect against floating point decimal issue. (https://stackoverflow.com/questions/10473994/javascript-adding-decimal-numbers-issue)
-        } else if(columns[j].totalRow && columns[j].customValue) {
-          value = 0;
-          totalRow[columns[j]['key']] = 0;
-        }
-        else {
-          totalRow[columns[j]['key']] = '';
-        }
-      } 
+      }
     }
   }
 
@@ -173,18 +179,20 @@ function ThanosTable({ columns, rows, options }) {
                         {sortedFirstPageRow.map((row) => {
                           return (
                             <TableRow>
-                              {columns.map((column, index) => (
-                                <StyledTableCell cellStyle={(column.key && column.columnCellStyle) 
-                                                 ? ({backgroundColor: '#fff', ...column.columnCellStyle(row), 
-                                                    ...(options.stickyColumn && (index === 0) && {position: 'sticky', left: 0, zIndex: 90}),
-                                                    minWidth: (column.minColWidth || options.minCellWidth)}) 
-                                                 : ({backgroundColor: '#fff', ...options.rowCellStyle, 
-                                                    ...(options.stickyColumn && (index === 0) && {position: 'sticky', left: 0, zIndex: 90}),
-                                                    minWidth: (column.minColWidth || options.minCellWidth)})}
-                                >
-                                  {(column.key && !column.customValue) ? (row[column.key]) : column.customValue(row) }
-                                </StyledTableCell>
-                              ))}
+                              {columns.map((column, index) => {
+                                return( 
+                                  <StyledTableCell cellStyle={(column.key && column.columnCellStyle) 
+                                                  ? ({backgroundColor: '#fff', ...column.columnCellStyle(row), 
+                                                      ...(options.stickyColumn && (index === 0) && {position: 'sticky', left: 0, zIndex: 90}),
+                                                      minWidth: (column.minColWidth || options.minCellWidth)}) 
+                                                  : ({backgroundColor: '#fff', ...options.rowCellStyle, 
+                                                      ...(options.stickyColumn && (index === 0) && {position: 'sticky', left: 0, zIndex: 90}),
+                                                      minWidth: (column.minColWidth || options.minCellWidth)})}
+                                  >
+                                    {(column.key && !column.customElement) ? (row[column.key]) : column.customElement(row) }
+                                  </StyledTableCell>
+                                );
+                              })}
                             </TableRow>
                           );
                         })}
@@ -194,20 +202,30 @@ function ThanosTable({ columns, rows, options }) {
                             </TableRow>
                         )}
                         <TableRow>
-                            {columns.map((column, index) => ( 
-                              <StyledTableCell cellStyle={(column.key && column.columnCellStyle && !column.footerStylePriority) 
-                                               ? ({backgroundColor: '#fff', ...column.columnCellStyle(totalRow), 
-                                                 ...(options.stickyFooter && {position: 'sticky', bottom: 0, zIndex: 100}), 
-                                                 ...(options.stickyColumn && (index === 0) && {position: 'sticky', left: 0, zIndex: 110}),
-                                                 minWidth: (column.minColWidth || options.minCellWidth)}) 
-                                               : ({backgroundColor: '#fff', ...options.footerCellStyle, 
-                                                 ...(options.stickyFooter && {position: 'sticky', bottom: 0, zIndex: 100}), 
-                                                 ...(options.stickyColumn && (index === 0) && {position: 'sticky', left: 0, zIndex: 110}),
-                                                 minWidth: (column.minColWidth || options.minCellWidth)})}
-                              >
-                                {(column.key && !column.customValue) ? totalRow[column.key] : column.customValue(totalRow) }
-                              </StyledTableCell>
-                            ))}
+                            {withDefaultOptions.totalRow
+                              ? columns.map((column, index) => {
+                              console.log(column);
+                              return(
+                                <StyledTableCell cellStyle={(column.key && column.columnCellStyle && !column.footerStylePriority) 
+                                                ? ({backgroundColor: '#fff', ...column.columnCellStyle(totalRow), 
+                                                  ...(options.stickyFooter && {position: 'sticky', bottom: 0, zIndex: 100}), 
+                                                  ...(options.stickyColumn && (index === 0) && {position: 'sticky', left: 0, zIndex: 110}),
+                                                  minWidth: (column.minColWidth || options.minCellWidth)}) 
+                                                : ({backgroundColor: '#fff', ...options.footerCellStyle, 
+                                                  ...(options.stickyFooter && {position: 'sticky', bottom: 0, zIndex: 100}), 
+                                                  ...(options.stickyColumn && (index === 0) && {position: 'sticky', left: 0, zIndex: 110}),
+                                                  minWidth: (column.minColWidth || options.minCellWidth)})}
+                                >
+                                  {(column.key && column.totalRow) 
+                                    ? (column.totalRowCellName
+                                      ? column.totalRowCellName 
+                                      : (column.customElement 
+                                        ? (column.customElement(totalRow)) 
+                                        : (totalRow[column.key]))) 
+                                    : null}
+                                </StyledTableCell>
+                              );
+                            }) : null}
                         </TableRow>
                     </TableBody>
                 </Table>
