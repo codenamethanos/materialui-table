@@ -15,6 +15,8 @@ var _Paper = _interopRequireDefault(require("@material-ui/core/Paper"));
 
 var _Table = _interopRequireDefault(require("@material-ui/core/Table"));
 
+var _IconButton = _interopRequireDefault(require("@material-ui/core/IconButton"));
+
 var _TableBody = _interopRequireDefault(require("@material-ui/core/TableBody"));
 
 var _TableRow = _interopRequireDefault(require("@material-ui/core/TableRow"));
@@ -28,6 +30,8 @@ var _TablePagination = _interopRequireDefault(require("@material-ui/core/TablePa
 var _ThanosTableHead = _interopRequireDefault(require("./ThanosTableHead"));
 
 var _ThanosTableToolbar = _interopRequireDefault(require("./ThanosTableToolbar"));
+
+var _Tooltip = _interopRequireDefault(require("@material-ui/core/Tooltip"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -224,6 +228,9 @@ function ThanosTable(_ref2) {
   };
 
   var emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+  var leftRow = 0;
+  var leftFooter = 0;
+  var currentActionElement = null;
   var keyObject = {};
 
   if (columns && columns.length > 0) {
@@ -245,7 +252,7 @@ function ThanosTable(_ref2) {
     if (withDefaultOptions.totalRow) {
       for (var _i2 = 0, n1 = sortedFirstPageRow.length; _i2 < n1; _i2++) {
         for (var j = 0, n2 = columns.length; j < n2; j++) {
-          if (!columns[j].customElement) {
+          if (!columns[j].customElement || !columns[j].actionElement) {
             value = 0;
             value = Number(sortedFirstPageRow[_i2][columns[j].key]) || 0;
             totalRow[columns[j]['key']] = totalRow[columns[j]['key']] ? totalRow[columns[j]['key']] + value : value;
@@ -280,11 +287,15 @@ function ThanosTable(_ref2) {
     orderBy: orderBy,
     onRequestSort: handleRequestSort
   }), /*#__PURE__*/_react.default.createElement(_TableBody.default, null, sortedFirstPageRow.map(function (row) {
+    leftRow = 0;
     return /*#__PURE__*/_react.default.createElement(_TableRow.default, null, visibleColumns.map(function (column, index) {
+      if (!column.actionElement || leftRow) leftRow++;
+      currentActionElement = null;
+      if (column.actionElement) currentActionElement = column.actionElement(row);
       return /*#__PURE__*/_react.default.createElement(StyledTableCell, {
-        cellStyle: column.key && column.columnCellStyle ? _objectSpread({
+        cellStyle: column.columnCellStyle ? _objectSpread({
           backgroundColor: '#fff'
-        }, column.columnCellStyle(row), {}, options.stickyColumn && index === 0 && {
+        }, column.columnCellStyle(row), {}, options.stickyColumn && leftRow === 1 && {
           position: 'sticky',
           left: 0,
           zIndex: 90
@@ -292,14 +303,24 @@ function ThanosTable(_ref2) {
           width: column.minColWidth || options.minCellWidth
         }) : _objectSpread({
           backgroundColor: '#fff'
-        }, options.rowCellStyle, {}, options.stickyColumn && index === 0 && {
+        }, options.rowCellStyle, {}, options.stickyColumn && leftRow === 1 && {
           position: 'sticky',
           left: 0,
           zIndex: 90
         }, {
           width: column.minColWidth || options.minCellWidth
         })
-      }, column.key && !column.customElement ? row[column.key] : column.customElement(row));
+      }, !(column.customElement || column.actionElement) ? row[column.key] : column.actionElement ? /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+        title: currentActionElement.toolTip
+      }, /*#__PURE__*/_react.default.createElement(_IconButton.default, {
+        onClick: function onClick(e) {
+          return column.actionElement(row).onClick(row, e);
+        },
+        size: "small",
+        disabled: currentActionElement.disabled,
+        color: currentActionElement.color,
+        component: "span"
+      }, currentActionElement.icon)) : column.customElement(row));
     }));
   }), emptyRows > 0 && options.showEmptyRows && /*#__PURE__*/_react.default.createElement(_TableRow.default, {
     style: {
@@ -308,14 +329,15 @@ function ThanosTable(_ref2) {
   }, /*#__PURE__*/_react.default.createElement(_TableCell.default, {
     colSpan: 6
   })), /*#__PURE__*/_react.default.createElement(_TableRow.default, null, withDefaultOptions.totalRow ? visibleColumns.map(function (column, index) {
+    if (!column.actionElement || leftFooter) leftFooter++;
     return /*#__PURE__*/_react.default.createElement(StyledTableCell, {
-      cellStyle: column.key && column.columnCellStyle && !column.footerStylePriority ? _objectSpread({
+      cellStyle: column.columnCellStyle && !column.footerStylePriority ? _objectSpread({
         backgroundColor: '#fff'
       }, column.columnCellStyle(totalRow), {}, options.stickyFooter && {
         position: 'sticky',
         bottom: 0,
         zIndex: 100
-      }, {}, options.stickyColumn && index === 0 && {
+      }, {}, options.stickyColumn && leftFooter === 1 && {
         position: 'sticky',
         left: 0,
         zIndex: 110
@@ -327,14 +349,14 @@ function ThanosTable(_ref2) {
         position: 'sticky',
         bottom: 0,
         zIndex: 100
-      }, {}, options.stickyColumn && index === 0 && {
+      }, {}, options.stickyColumn && leftFooter === 1 && {
         position: 'sticky',
         left: 0,
         zIndex: 110
       }, {
         width: column.minColWidth || options.minCellWidth
       })
-    }, column.key && column.totalRow ? column.totalRowCellName ? column.totalRowCellName : column.customElement ? column.customElement(totalRow) : totalRow[column.key] : null);
+    }, column.totalRow ? column.totalRowCellName ? column.totalRowCellName : column.customElement ? column.customElement(totalRow) : totalRow[column.key] : null);
   }) : null)))), /*#__PURE__*/_react.default.createElement(_TablePagination.default, {
     rowsPerPageOptions: options.pageOptions || [5, 10, 25],
     component: "div",

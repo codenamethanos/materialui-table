@@ -32,18 +32,20 @@ function ThanosTableHead(props) {
     };
   };
 
+  var leftHead = 0;
   return /*#__PURE__*/_react.default.createElement(_TableHead.default, null, /*#__PURE__*/_react.default.createElement(_core.TableRow, null, columns.map(function (column, index) {
+    if (!column.actionElement || leftHead) leftHead++;
     return /*#__PURE__*/_react.default.createElement(_TableCell.default, {
       classes: {
-        head: index === 0 ? classes.headerStyleLeftFixed : classes.headerCellStyle
+        head: leftHead === 1 ? classes.headerStyleLeftFixed : classes.headerCellStyle
       },
       key: column['key'],
       sortDirection: !orderBy && orderBy.length === 0 && column.defaultSort ? column.defaultSort : orderBy === column['key'] ? order : false
-    }, /*#__PURE__*/_react.default.createElement(_TableSortLabel.default, {
+    }, !column.actionElement ? /*#__PURE__*/_react.default.createElement(_TableSortLabel.default, {
       active: !orderBy && orderBy.length === 0 && column.defaultSort || orderBy === column['key'],
       direction: !orderBy && orderBy.length === 0 && column.defaultSort ? column.defaultSort : orderBy === column['key'] ? order : 'asc',
       onClick: createSortHandler(column['key'])
-    }, column['title']));
+    }, column['title']) : null);
   })));
 }
 

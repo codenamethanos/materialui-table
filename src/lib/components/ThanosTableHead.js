@@ -11,26 +11,30 @@ function ThanosTableHead(props) {
         columns,
         order, 
         orderBy, 
-        onRequestSort 
+        onRequestSort
     } = props;
 
     const createSortHandler = (property) => (event) => {
         onRequestSort(event, property);
     };
 
+    let leftHead = 0;
+
     return (
         <TableHead>
             <TableRow>
                 {columns.map((column, index) => {
+                    if(!column.actionElement || leftHead) leftHead++;
                     return (
                         <TableCell
-                            classes={{ head: ((index === 0) ? (classes.headerStyleLeftFixed) : (classes.headerCellStyle)) }}
+                            classes={{ head: ((leftHead === 1) ? (classes.headerStyleLeftFixed) : (classes.headerCellStyle)) }}
                             key={column['key']} 
                             sortDirection={(!orderBy && (orderBy.length === 0) && column.defaultSort) 
                                 ? column.defaultSort 
                                 : (orderBy === column['key'] ? order : false)}
                         >
-                            <TableSortLabel
+                            {!column.actionElement 
+                            ? <TableSortLabel
                                 active={(!orderBy && (orderBy.length === 0) && column.defaultSort) || (orderBy === column['key'])}
                                 direction={(!orderBy && (orderBy.length === 0) && column.defaultSort) 
                                     ? column.defaultSort 
@@ -39,6 +43,8 @@ function ThanosTableHead(props) {
                             >
                                 {column['title']}
                             </TableSortLabel>
+                            : null
+                            }
                         </TableCell>
                     );
                 })}

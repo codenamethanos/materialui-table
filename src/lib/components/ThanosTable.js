@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
+import IconButton from '@material-ui/core/IconButton';
 import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
@@ -9,6 +10,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TablePagination from '@material-ui/core/TablePagination';
 import ThanosTableHead from "./ThanosTableHead";
 import ThanosTableToolbar from "./ThanosTableToolbar";
+import Tooltip from '@material-ui/core/Tooltip';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -125,6 +127,9 @@ function ThanosTable({ columns, rows, options }) {
   };
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+  let leftRow = 0;
+  let leftFooter = 0;
+  let currentActionElement = null;
 
   let keyObject = {};
   if(columns && columns.length > 0) { 
@@ -146,7 +151,7 @@ function ThanosTable({ columns, rows, options }) {
     if(withDefaultOptions.totalRow) {
       for(let i=0, n1=sortedFirstPageRow.length; i<n1; i++) {
         for(let j=0, n2=columns.length; j<n2; j++) {
-          if(!columns[j].customElement) {
+          if(!columns[j].customElement || !columns[j].actionElement) {
             value = 0;
             value = Number(sortedFirstPageRow[i][columns[j].key]) || 0; 
             totalRow[columns[j]['key']] = (totalRow[columns[j]['key']] ? (totalRow[columns[j]['key']] + value) : value);
@@ -183,19 +188,39 @@ function ThanosTable({ columns, rows, options }) {
                     />
                     <TableBody> 
                         {sortedFirstPageRow.map((row) => {
+                          leftRow = 0;
                           return (
                             <TableRow>
                               {visibleColumns.map((column, index) => {
+                                if(!column.actionElement || leftRow) leftRow++;
+                                currentActionElement = null;
+                                if(column.actionElement) currentActionElement = column.actionElement(row);
                                 return( 
-                                  <StyledTableCell cellStyle={(column.key && column.columnCellStyle) 
+                                  <StyledTableCell cellStyle={(column.columnCellStyle) 
                                                   ? ({backgroundColor: '#fff', ...column.columnCellStyle(row), 
-                                                      ...(options.stickyColumn && (index === 0) && {position: 'sticky', left: 0, zIndex: 90}),
+                                                      ...(options.stickyColumn && (leftRow === 1) && {position: 'sticky', left: 0, zIndex: 90}),
                                                       width: (column.minColWidth || options.minCellWidth)}) 
                                                   : ({backgroundColor: '#fff', ...options.rowCellStyle, 
-                                                      ...(options.stickyColumn && (index === 0) && {position: 'sticky', left: 0, zIndex: 90}),
+                                                      ...(options.stickyColumn && (leftRow === 1) && {position: 'sticky', left: 0, zIndex: 90}),
                                                       width: (column.minColWidth || options.minCellWidth)})}
                                   >
-                                    {(column.key && !column.customElement) ? (row[column.key]) : column.customElement(row) }
+                                    {(!(column.customElement || column.actionElement)) 
+                                    ? row[column.key] 
+                                    : (column.actionElement 
+                                      ? (
+                                        <Tooltip title={currentActionElement.toolTip}>
+                                          <IconButton 
+                                            onClick={(e) => column.actionElement(row).onClick(row, e)} 
+                                            size="small" 
+                                            disabled={currentActionElement.disabled} 
+                                            color={currentActionElement.color} 
+                                            component="span"
+                                          >
+                                            {currentActionElement.icon}
+                                          </IconButton>
+                                        </Tooltip>
+                                      )
+                                      : column.customElement(row) )}
                                   </StyledTableCell>
                                 );
                               })}
@@ -210,18 +235,19 @@ function ThanosTable({ columns, rows, options }) {
                         <TableRow>
                             {withDefaultOptions.totalRow
                               ? visibleColumns.map((column, index) => {
+                              if(!column.actionElement || leftFooter) leftFooter++;
                               return(
-                                <StyledTableCell cellStyle={(column.key && column.columnCellStyle && !column.footerStylePriority) 
+                                <StyledTableCell cellStyle={(column.columnCellStyle && !column.footerStylePriority) 
                                                 ? ({backgroundColor: '#fff', ...column.columnCellStyle(totalRow), 
                                                   ...(options.stickyFooter && {position: 'sticky', bottom: 0, zIndex: 100}), 
-                                                  ...(options.stickyColumn && (index === 0) && {position: 'sticky', left: 0, zIndex: 110}),
+                                                  ...(options.stickyColumn && (leftFooter === 1) && {position: 'sticky', left: 0, zIndex: 110}),
                                                   width: (column.minColWidth || options.minCellWidth)}) 
                                                 : ({backgroundColor: '#fff', ...options.footerCellStyle, 
                                                   ...(options.stickyFooter && {position: 'sticky', bottom: 0, zIndex: 100}), 
-                                                  ...(options.stickyColumn && (index === 0) && {position: 'sticky', left: 0, zIndex: 110}),
+                                                  ...(options.stickyColumn && (leftFooter === 1) && {position: 'sticky', left: 0, zIndex: 110}),
                                                   width: (column.minColWidth || options.minCellWidth)})}
                                 >
-                                  {(column.key && column.totalRow) 
+                                  {(column.totalRow) 
                                     ? (column.totalRowCellName
                                       ? column.totalRowCellName 
                                       : (column.customElement 

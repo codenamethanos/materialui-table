@@ -1,10 +1,8 @@
 import React from "react"; 
 import { makeStyles } from '@material-ui/core/styles';
-import Icon from '@material-ui/core/Icon';
-import Link from '@material-ui/core/Link'; 
 import Button from '@material-ui/core/Button'; 
-import PauseIcon from '@material-ui/icons/Pause'; 
-import IconButton from '@material-ui/core/IconButton';
+import AddIcon from '@material-ui/icons/Add';
+import RemoveIcon from '@material-ui/icons/Remove';
 import ThanosTable from "../lib";
 
 const useStyles = makeStyles((theme) => ({
@@ -36,31 +34,75 @@ function App() {
     createData('Oreo', 437, 18.0, 63, 4.0, 437, 18.0, 63, 4.0, 437, 18.0, 63, 4.0),
   ];
 
+  // SOME INFO
   // key is mandatory. Each key should be unique. 
   // It should match row keys for normal row values, and can be anything for custom values.
+  // title is not mandatory. It is used to name column headers.So it is recommended. 
   // If there are multiple defaultSort, last one takes preference.
   // In customSort: Return numerical value if you want sorted numerically.
   // In customSort: Return string if you want sorted alphabetically.
-  // totalRowCellName and totalRow cannot be together. If it happens, totalRowCellName takes preference.
+  // totalRowCellName and totalRow cant be displayed together. If it happens, totalRowCellName takes preference.
   // totalRow of customElement is also computed by the same equation returned in customElement.
-  // columnCellStyle can be made to have lower/higher priority than footerCellStyle. Default is higher. 
+  // columnCellStyle can be made to have lower/higher priority than footerCellStyle using footerStylePriority. Default is higher. 
+  // If actionElement exist, then the column is treated as an action. Also customElement and title wont work.
   // minColWidth has higher priority than minCellWidth
+
+  // COLUMNS DEFAULT VALUES
+  // key - Compulsary. No default value
+  // title - No default value
+  // totalRow - Default value is false
+  // totalRowCellName - No default value
+  // actionElement - No default value
+  // customElement - No default value
+  // columnCellStyle - - No default value
+  // footerStylePriority - Default value is false
+  // defaultSort - No default value
+  // customSort - No default value
+
   const columns = [
-    { key: 'action', 
-      title: 'Action',
-      minColWidth: 30,
-      customElement: function(row) {
-        return(
-          <IconButton size="small" color="primary" aria-label="upload picture" component="span">
-            <PauseIcon />
-          </IconButton>
-        );
-      }
+    { key: 'action1', 
+      title: 'Action 1',
+      actionElement: function(row) {
+        return({
+          icon: <AddIcon />,
+          toolTip: 'Add Item',
+          disabled: false,
+          color: 'primary',
+          onClick: function(row, event) {
+            alert("Added " + row.name);
+          }
+        });
+      },
+      columnCellStyle: function(row) {
+        return { backgroundColor: '#03DAC5', color: '#000' };
+      },
+      footerStylePriority: true
     },
-    { key: 'name', title: 'Dessert (100g serving)', totalRowCellName: 'Total', 
+    { key: 'action2', 
+      title: 'Action 2',
+      actionElement: function(row) {
+        return({
+          icon: <RemoveIcon />,
+          toolTip: 'Remove Item',
+          disabled: false,
+          color: 'secondary',
+          onClick: function(row, event) {
+            alert("Removed " + row.name);
+          }
+        });
+      },
+      columnCellStyle: function(row) {
+        return { backgroundColor: '#03DAC5', color: '#000' };
+      },
+      footerStylePriority: true
+    },
+    { key: 'name', 
+      title: 'Dessert (100g serving)', 
+      totalRow: true,
+      totalRowCellName: 'Total', 
       // minColWidth: 300,
       columnCellStyle: function(row) {
-          return { backgroundColor: '#dedede' };
+          return { backgroundColor: '#03DAC5', color: '#000' };
       },
       footerStylePriority: true
     }, 
@@ -68,21 +110,9 @@ function App() {
     { key: 'fat', title: 'Fat', totalRow: true },
     { key: 'carbs', title: 'Carbs', totalRow: true },
     { key: 'protein', title: 'Protein', totalRow: true },
-    // { key: 'link', 
-    //   title: 'Link',
-    //   totalRow: true,
-    //   customElement: function(row) {
-    //     return( 
-    //       <Link href={"/campaigns/"}>
-    //           {(row.fat + row.carbs + row.protein).toFixed(2)}
-    //       </Link>
-    //     );
-    //   }
-    // },
-    { key: 'button', 
+    { key: 'button',  
       title: 'Button',
-      minColWidth: 300,
-      totalRow: false,
+      // minColWidth: 300,
       customElement: function(row) {
         return(
           <Button className={classes.root} variant="contained" size="small" fullWidth={true} >
@@ -90,15 +120,14 @@ function App() {
           </Button>
         );
       },
-      columnCellStyle: function(row) {
-        return { padding: '0px 0px 0px 0px', verticalAlign: 'top', height: '100%' };
+      columnCellStyle: function(row) { 
+        return { backgroundColor: '#F6F6F6', color: '#000' };
       },
+      footerStylePriority: true
     }, 
     { key: 'img', 
       title: 'Image',
-      minColWidth: 300,
-      totalRowCellName: 'Yo', // Does not work along with customElement
-      totalRow: true,
+      // minColWidth: 300,
       customElement: function(row) {
         return(
           <img alt='bannera' src={'https://allpiki.ru/wp-content/uploads/2020/01/1579269254_korzik_net_u-1-300x210.jpg'} style={{ width: 50, borderRadius: '10%' }} />
@@ -108,8 +137,6 @@ function App() {
     { key: 'weight', 
       title: 'Weight', 
       totalRow: true,
-      // totalRowCellName: 'Yo',
-      // minColWidth: 300,
       customElement: function(row) { 
         return <div>{(row.fat + row.carbs + row.protein).toFixed(2)}</div>; 
       },
@@ -118,11 +145,11 @@ function App() {
       },
       columnCellStyle: function(row) {
         if(row.fat + row.carbs + row.protein > 50) 
-          return { backgroundColor: 'green', color: 'white' };
+          return { backgroundColor: '#006B1E', color: '#FFF' };
         else 
-          return null;
+          return { backgroundColor: '#B00020', color: '#FFF' };;
       },
-      footerStylePriority: false // false is default value
+      footerStylePriority: false 
     },
     { key: 'calories2', title: 'Calories 2', totalRow: true },
     { key: 'fat2', title: 'Fat 2', totalRow: true },
@@ -133,23 +160,25 @@ function App() {
     { key: 'carbs3', title: 'Carbs 3', totalRow: true },
     { key: 'protein3', title: 'Protein 3', totalRow: true },
   ];
-
+  
   const options = {
-    title: 'Test Table', // Default is ''
+    title: 'Thanos Table', // Default is ''
     defaultPage: 0, // Default is 0
     defaultRowsPerPage: 5, // Default is 5
     pageOptions: [5, 10, 25, 50], // Default is [5, 10, 25]
     stickyHeader: true, // Default is false
     stickyFooter: true, // Default is false
-    stickyColumn: true, // Default is false
+    stickyColumn: true, // Default is false. If true, leftmost column that is not an action will be stickied.
     showEmptyRows: false, // Default is false
     totalRow: true, // Default is true
     maxTableHeight: 640, // No default value
     // minCellWidth: 200, // No default value
-    headerCellStyle: { fontWeight: '600' }, // Default is { fontWeight: 'bold', backgroundColor: '#fff' }
-    rowCellStyle: {  backgroundColor: '#F2EEEE' }, // Default is { backgroundColor: '#fff' }
-    footerCellStyle: { backgroundColor: '#3f51b5', color: 'white' }, // Default is { backgroundColor: '#fff' }
-    showColumns: ['action', 'name', 'calories', 'fat', 'protein'] // No default value 
+    headerCellStyle: { fontWeight: '600', backgroundColor: '#FFF', color: '#000' }, // Default is { fontWeight: 'bold', backgroundColor: '#fff' }
+    rowCellStyle: {  backgroundColor: '#F6F6F6' }, // Default is { backgroundColor: '#fff' }
+    footerCellStyle: { backgroundColor: '#3F51B5', color: '#FFF' }, // Default is { backgroundColor: '#fff' }
+    showColumns: [] // Default value is null or [] which means all columns are visible. 
+                    // Usage example: ['action1', 'action2', 'name', 'calories', 'fat', 'carbs', 'protein', 'button', 'img',
+                    // 'weight', 'calories2', 'fat2', 'carbs2', 'protein2', 'calories3', 'fat3', 'carbs3', 'protein3'] 
   };
 
   return( 
