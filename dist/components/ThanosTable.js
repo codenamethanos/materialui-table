@@ -64,7 +64,11 @@ var useStyles = (0, _styles.makeStyles)(function (theme) {
     },
     table: {
       minWidth: 750,
-      borderCollapse: 'collapse'
+      borderCollapse: 'collapse',
+      // CHANGE BELOW
+      // https://stackoverflow.com/questions/53499803/make-table-header-and-first-two-columns-fixed
+      whiteSpace: 'nowrap',
+      tableLayout: 'auto'
     },
     container: function container(options) {
       return {
@@ -73,17 +77,19 @@ var useStyles = (0, _styles.makeStyles)(function (theme) {
     },
     headerCellStyle: function headerCellStyle(options) {
       return _objectSpread({
+        fontWeight: 'bold',
         backgroundColor: '#fff'
       }, options.headerCellStyle, {}, options.stickyHeader && {
         position: 'sticky',
         top: 0,
         zIndex: 100
       }, {
-        minWidth: options.minCellWidth
+        width: options.minCellWidth
       });
     },
     headerStyleLeftFixed: function headerStyleLeftFixed(options) {
       return _objectSpread({
+        fontWeight: 'bold',
         backgroundColor: '#fff'
       }, options.headerCellStyle, {}, options.stickyColumn && {
         position: 'sticky',
@@ -94,7 +100,7 @@ var useStyles = (0, _styles.makeStyles)(function (theme) {
         top: 0,
         zIndex: 110
       }, {
-        minWidth: options.minCellWidth
+        width: options.minCellWidth
       });
     }
   };
@@ -187,6 +193,13 @@ function ThanosTable(_ref2) {
       rowsPerPage = _useState8[0],
       setRowsPerPage = _useState8[1];
 
+  var _useState9 = (0, _react.useState)(options.showColumns && options.showColumns.length > 0 ? columns.filter(function (x) {
+    return options.showColumns.includes(x.key);
+  }) : columns),
+      _useState10 = _slicedToArray(_useState9, 2),
+      visibleColumns = _useState10[0],
+      setVisibleColumns = _useState10[1];
+
   var withDefaultOptions = _objectSpread({
     totalRow: true
   }, options);
@@ -195,6 +208,10 @@ function ThanosTable(_ref2) {
     var isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
+  };
+
+  var handleColumnChange = function handleColumnChange(property) {
+    setVisibleColumns(property);
   };
 
   var handleChangePage = function handleChangePage(event, newPage) {
@@ -228,11 +245,6 @@ function ThanosTable(_ref2) {
     if (withDefaultOptions.totalRow) {
       for (var _i2 = 0, n1 = sortedFirstPageRow.length; _i2 < n1; _i2++) {
         for (var j = 0, n2 = columns.length; j < n2; j++) {
-          // if(columns[j].totalRow) {
-          // if(columns[j].totalRowCellName) {
-          // if(i === 0) totalRow[columns[j]['key']] = columns[j].totalRowCellName; 
-          // }
-          // else {
           if (!columns[j].customElement) {
             value = 0;
             value = Number(sortedFirstPageRow[_i2][columns[j].key]) || 0;
@@ -240,11 +252,7 @@ function ThanosTable(_ref2) {
             if (_i2 === n1 - 1) totalRow[columns[j]['key']] = Math.round(totalRow[columns[j]['key']] * 1e12) / 1e12; // Math.round((totalRow[columns[j].key]) * 1e12) / 1e12 ... is used to protect against floating point decimal issue. (https://stackoverflow.com/questions/10473994/javascript-adding-decimal-numbers-issue)
           } else {
             if (_i2 === 0) totalRow[columns[j]['key']] = 0;
-          } // }
-          // } else {
-          // if(i === 0) totalRow[columns[j]['key']] = ''; 
-          // }
-
+          }
         }
       }
     }
@@ -255,7 +263,10 @@ function ThanosTable(_ref2) {
   }, /*#__PURE__*/_react.default.createElement(_Paper.default, {
     className: classes.paper
   }, /*#__PURE__*/_react.default.createElement(_ThanosTableToolbar.default, {
-    title: options.title || ''
+    title: options.title || '',
+    columns: columns,
+    visibleColumns: visibleColumns,
+    onColumnChange: handleColumnChange
   }), /*#__PURE__*/_react.default.createElement(_TableContainer.default, {
     className: classes.container
   }, /*#__PURE__*/_react.default.createElement(_Table.default, {
@@ -264,12 +275,12 @@ function ThanosTable(_ref2) {
     "aria-label": "enhanced table"
   }, /*#__PURE__*/_react.default.createElement(_ThanosTableHead.default, {
     classes: classes,
-    columns: columns,
+    columns: visibleColumns,
     order: order,
     orderBy: orderBy,
     onRequestSort: handleRequestSort
   }), /*#__PURE__*/_react.default.createElement(_TableBody.default, null, sortedFirstPageRow.map(function (row) {
-    return /*#__PURE__*/_react.default.createElement(_TableRow.default, null, columns.map(function (column, index) {
+    return /*#__PURE__*/_react.default.createElement(_TableRow.default, null, visibleColumns.map(function (column, index) {
       return /*#__PURE__*/_react.default.createElement(StyledTableCell, {
         cellStyle: column.key && column.columnCellStyle ? _objectSpread({
           backgroundColor: '#fff'
@@ -278,7 +289,7 @@ function ThanosTable(_ref2) {
           left: 0,
           zIndex: 90
         }, {
-          minWidth: column.minColWidth || options.minCellWidth
+          width: column.minColWidth || options.minCellWidth
         }) : _objectSpread({
           backgroundColor: '#fff'
         }, options.rowCellStyle, {}, options.stickyColumn && index === 0 && {
@@ -286,7 +297,7 @@ function ThanosTable(_ref2) {
           left: 0,
           zIndex: 90
         }, {
-          minWidth: column.minColWidth || options.minCellWidth
+          width: column.minColWidth || options.minCellWidth
         })
       }, column.key && !column.customElement ? row[column.key] : column.customElement(row));
     }));
@@ -296,8 +307,7 @@ function ThanosTable(_ref2) {
     }
   }, /*#__PURE__*/_react.default.createElement(_TableCell.default, {
     colSpan: 6
-  })), /*#__PURE__*/_react.default.createElement(_TableRow.default, null, withDefaultOptions.totalRow ? columns.map(function (column, index) {
-    console.log(column);
+  })), /*#__PURE__*/_react.default.createElement(_TableRow.default, null, withDefaultOptions.totalRow ? visibleColumns.map(function (column, index) {
     return /*#__PURE__*/_react.default.createElement(StyledTableCell, {
       cellStyle: column.key && column.columnCellStyle && !column.footerStylePriority ? _objectSpread({
         backgroundColor: '#fff'
@@ -310,7 +320,7 @@ function ThanosTable(_ref2) {
         left: 0,
         zIndex: 110
       }, {
-        minWidth: column.minColWidth || options.minCellWidth
+        width: column.minColWidth || options.minCellWidth
       }) : _objectSpread({
         backgroundColor: '#fff'
       }, options.footerCellStyle, {}, options.stickyFooter && {
@@ -322,7 +332,7 @@ function ThanosTable(_ref2) {
         left: 0,
         zIndex: 110
       }, {
-        minWidth: column.minColWidth || options.minCellWidth
+        width: column.minColWidth || options.minCellWidth
       })
     }, column.key && column.totalRow ? column.totalRowCellName ? column.totalRowCellName : column.customElement ? column.customElement(totalRow) : totalRow[column.key] : null);
   }) : null)))), /*#__PURE__*/_react.default.createElement(_TablePagination.default, {

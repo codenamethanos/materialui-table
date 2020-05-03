@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
@@ -20,23 +20,29 @@ const useStyles = makeStyles((theme) => ({
     },
     table: {
       minWidth: 750,
-      borderCollapse: 'collapse'
+      borderCollapse: 'collapse',
+      // CHANGE BELOW
+      // https://stackoverflow.com/questions/53499803/make-table-header-and-first-two-columns-fixed
+      whiteSpace: 'nowrap',
+      tableLayout: 'auto'
     },
     container: options => ({
       maxHeight: options.maxTableHeight
     }),
     headerCellStyle: options => ({
+      fontWeight: 'bold',
       backgroundColor: '#fff',
       ...options.headerCellStyle, 
       ...(options.stickyHeader && {position: 'sticky', top: 0, zIndex: 100}), 
-      minWidth: options.minCellWidth
+      width: options.minCellWidth
     }),
     headerStyleLeftFixed: options => ({
+      fontWeight: 'bold',
       backgroundColor: '#fff',
       ...options.headerCellStyle, 
       ...(options.stickyColumn && {position: 'sticky', left: 0, zIndex: 110}),
       ...(options.stickyHeader && {position: 'sticky', top: 0, zIndex: 110}), 
-      minWidth: options.minCellWidth
+      width: options.minCellWidth
     })
 }));
 
@@ -95,6 +101,7 @@ function ThanosTable({ columns, rows, options }) {
   const [orderBy, setOrderBy] = useState('');
   const [page, setPage] = useState(options.defaultPage || 0);
   const [rowsPerPage, setRowsPerPage] = useState(options.defaultRowsPerPage || 5);
+  const [visibleColumns, setVisibleColumns] = useState((options.showColumns && options.showColumns.length > 0) ? columns.filter(x => options.showColumns.includes(x.key)) : columns);
 
   let withDefaultOptions = {totalRow: true, ...options};
   
@@ -102,6 +109,10 @@ function ThanosTable({ columns, rows, options }) {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
+  };
+
+  const handleColumnChange = (property) => {
+    setVisibleColumns(property);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -135,24 +146,14 @@ function ThanosTable({ columns, rows, options }) {
     if(withDefaultOptions.totalRow) {
       for(let i=0, n1=sortedFirstPageRow.length; i<n1; i++) {
         for(let j=0, n2=columns.length; j<n2; j++) {
-          // if(columns[j].totalRow) {
-            // if(columns[j].totalRowCellName) {
-              // if(i === 0) totalRow[columns[j]['key']] = columns[j].totalRowCellName; 
-            // }
-            // else {
-              if(!columns[j].customElement) {
-                value = 0;
-                value = Number(sortedFirstPageRow[i][columns[j].key]) || 0; 
-                totalRow[columns[j]['key']] = (totalRow[columns[j]['key']] ? (totalRow[columns[j]['key']] + value) : value);
-                if(i === (n1-1)) totalRow[columns[j]['key']] = Math.round((totalRow[columns[j]['key']]) * 1e12) / 1e12 // Math.round((totalRow[columns[j].key]) * 1e12) / 1e12 ... is used to protect against floating point decimal issue. (https://stackoverflow.com/questions/10473994/javascript-adding-decimal-numbers-issue)
-              } else {
-                if(i === 0) totalRow[columns[j]['key']] = 0; 
-              }
-            // }
-          // } else {
-            // if(i === 0) totalRow[columns[j]['key']] = ''; 
-          // }
-
+          if(!columns[j].customElement) {
+            value = 0;
+            value = Number(sortedFirstPageRow[i][columns[j].key]) || 0; 
+            totalRow[columns[j]['key']] = (totalRow[columns[j]['key']] ? (totalRow[columns[j]['key']] + value) : value);
+            if(i === (n1-1)) totalRow[columns[j]['key']] = Math.round((totalRow[columns[j]['key']]) * 1e12) / 1e12 // Math.round((totalRow[columns[j].key]) * 1e12) / 1e12 ... is used to protect against floating point decimal issue. (https://stackoverflow.com/questions/10473994/javascript-adding-decimal-numbers-issue)
+          } else {
+            if(i === 0) totalRow[columns[j]['key']] = 0; 
+          }
         } 
       }
     }
@@ -161,7 +162,12 @@ function ThanosTable({ columns, rows, options }) {
   return (
     <div className={classes.root}>
         <Paper className={classes.paper}>
-            <ThanosTableToolbar title={options.title || ''} />
+            <ThanosTableToolbar 
+              title={options.title || ''} 
+              columns={columns} 
+              visibleColumns={visibleColumns}
+              onColumnChange={handleColumnChange}
+            />
             <TableContainer className={classes.container}>
                 <Table
                     className={classes.table}
@@ -170,7 +176,7 @@ function ThanosTable({ columns, rows, options }) {
                 >
                     <ThanosTableHead 
                         classes={classes}
-                        columns={columns}
+                        columns={visibleColumns}
                         order={order}
                         orderBy={orderBy}
                         onRequestSort={handleRequestSort}
@@ -179,15 +185,15 @@ function ThanosTable({ columns, rows, options }) {
                         {sortedFirstPageRow.map((row) => {
                           return (
                             <TableRow>
-                              {columns.map((column, index) => {
+                              {visibleColumns.map((column, index) => {
                                 return( 
                                   <StyledTableCell cellStyle={(column.key && column.columnCellStyle) 
                                                   ? ({backgroundColor: '#fff', ...column.columnCellStyle(row), 
                                                       ...(options.stickyColumn && (index === 0) && {position: 'sticky', left: 0, zIndex: 90}),
-                                                      minWidth: (column.minColWidth || options.minCellWidth)}) 
+                                                      width: (column.minColWidth || options.minCellWidth)}) 
                                                   : ({backgroundColor: '#fff', ...options.rowCellStyle, 
                                                       ...(options.stickyColumn && (index === 0) && {position: 'sticky', left: 0, zIndex: 90}),
-                                                      minWidth: (column.minColWidth || options.minCellWidth)})}
+                                                      width: (column.minColWidth || options.minCellWidth)})}
                                   >
                                     {(column.key && !column.customElement) ? (row[column.key]) : column.customElement(row) }
                                   </StyledTableCell>
@@ -203,18 +209,17 @@ function ThanosTable({ columns, rows, options }) {
                         )}
                         <TableRow>
                             {withDefaultOptions.totalRow
-                              ? columns.map((column, index) => {
-                              console.log(column);
+                              ? visibleColumns.map((column, index) => {
                               return(
                                 <StyledTableCell cellStyle={(column.key && column.columnCellStyle && !column.footerStylePriority) 
                                                 ? ({backgroundColor: '#fff', ...column.columnCellStyle(totalRow), 
                                                   ...(options.stickyFooter && {position: 'sticky', bottom: 0, zIndex: 100}), 
                                                   ...(options.stickyColumn && (index === 0) && {position: 'sticky', left: 0, zIndex: 110}),
-                                                  minWidth: (column.minColWidth || options.minCellWidth)}) 
+                                                  width: (column.minColWidth || options.minCellWidth)}) 
                                                 : ({backgroundColor: '#fff', ...options.footerCellStyle, 
                                                   ...(options.stickyFooter && {position: 'sticky', bottom: 0, zIndex: 100}), 
                                                   ...(options.stickyColumn && (index === 0) && {position: 'sticky', left: 0, zIndex: 110}),
-                                                  minWidth: (column.minColWidth || options.minCellWidth)})}
+                                                  width: (column.minColWidth || options.minCellWidth)})}
                                 >
                                   {(column.key && column.totalRow) 
                                     ? (column.totalRowCellName

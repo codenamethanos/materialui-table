@@ -1,10 +1,21 @@
 import React from "react"; 
+import { makeStyles } from '@material-ui/core/styles';
+import Icon from '@material-ui/core/Icon';
 import Link from '@material-ui/core/Link'; 
 import Button from '@material-ui/core/Button'; 
+import PauseIcon from '@material-ui/icons/Pause'; 
+import IconButton from '@material-ui/core/IconButton';
 import ThanosTable from "../lib";
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    // height: '100%'
+  }
+}));
 
 function App() {
 
+  const classes = useStyles();
   function createData(name, calories, fat, carbs, protein, calories2, fat2, carbs2, protein2, calories3, fat3, carbs3, protein3) {
     return { name, calories, fat, carbs, protein, calories2, fat2, carbs2, protein2, calories3, fat3, carbs3, protein3 };
   }
@@ -25,7 +36,8 @@ function App() {
     createData('Oreo', 437, 18.0, 63, 4.0, 437, 18.0, 63, 4.0, 437, 18.0, 63, 4.0),
   ];
 
-  // key is mandatory. It should match row keys for normal row values, and can be anything for custom values.
+  // key is mandatory. Each key should be unique. 
+  // It should match row keys for normal row values, and can be anything for custom values.
   // If there are multiple defaultSort, last one takes preference.
   // In customSort: Return numerical value if you want sorted numerically.
   // In customSort: Return string if you want sorted alphabetically.
@@ -34,38 +46,53 @@ function App() {
   // columnCellStyle can be made to have lower/higher priority than footerCellStyle. Default is higher. 
   // minColWidth has higher priority than minCellWidth
   const columns = [
-    { key: 'name', title: 'Dessert (100g serving)', totalRowCellName: 'Total', minColWidth: 300,
+    { key: 'action', 
+      title: 'Action',
+      minColWidth: 30,
+      customElement: function(row) {
+        return(
+          <IconButton size="small" color="primary" aria-label="upload picture" component="span">
+            <PauseIcon />
+          </IconButton>
+        );
+      }
+    },
+    { key: 'name', title: 'Dessert (100g serving)', totalRowCellName: 'Total', 
+      // minColWidth: 300,
       columnCellStyle: function(row) {
           return { backgroundColor: '#dedede' };
       },
       footerStylePriority: true
-    },
+    }, 
     { key: 'calories', title: 'Calories', defaultSort: 'asc', totalRow: true },
     { key: 'fat', title: 'Fat', totalRow: true },
     { key: 'carbs', title: 'Carbs', totalRow: true },
     { key: 'protein', title: 'Protein', totalRow: true },
-    { key: 'link', 
-      title: 'Link',
-      totalRow: true,
-      customElement: function(row) {
-        return( 
-          <Link href={"/campaigns/"}>
-              {(row.fat + row.carbs + row.protein).toFixed(2)}
-          </Link>
-        );
-      }
-    },
+    // { key: 'link', 
+    //   title: 'Link',
+    //   totalRow: true,
+    //   customElement: function(row) {
+    //     return( 
+    //       <Link href={"/campaigns/"}>
+    //           {(row.fat + row.carbs + row.protein).toFixed(2)}
+    //       </Link>
+    //     );
+    //   }
+    // },
     { key: 'button', 
       title: 'Button',
       minColWidth: 300,
       totalRow: false,
       customElement: function(row) {
         return(
-          <Button variant="contained">
+          <Button className={classes.root} variant="contained" size="small" fullWidth={true} >
             {row.name}
           </Button>
         );
-      }
+      },
+      columnCellStyle: function(row) {
+        return { padding: '0px 0px 0px 0px', verticalAlign: 'top', height: '100%' };
+      },
     }, 
     { key: 'img', 
       title: 'Image',
@@ -80,11 +107,10 @@ function App() {
     }, 
     { key: 'weight', 
       title: 'Weight', 
-      totalRow: false, // Does not work along with customElement. totalRow is printed anyway.
-      totalRowCellName: 'Yo',
-      minColWidth: 300,
+      totalRow: true,
+      // totalRowCellName: 'Yo',
+      // minColWidth: 300,
       customElement: function(row) { 
-        console.log(row);
         return <div>{(row.fat + row.carbs + row.protein).toFixed(2)}</div>; 
       },
       customSort: function(row) { 
@@ -118,11 +144,12 @@ function App() {
     stickyColumn: true, // Default is false
     showEmptyRows: false, // Default is false
     totalRow: true, // Default is true
-    maxTableHeight: 640, // No default value, MaterialUI default applies
-    minCellWidth: 100, // No default value, MaterialUI default applies
-    headerCellStyle: { fontWeight: 'bold' }, // Default is { backgroundColor: '#fff' }
-    rowCellStyle: { backgroundColor: '#F2EEEE' }, // Default is { backgroundColor: '#fff' }
-    footerCellStyle: { backgroundColor: '#3f51b5', color: 'white' } // Default is { backgroundColor: '#fff' }
+    maxTableHeight: 640, // No default value
+    // minCellWidth: 200, // No default value
+    headerCellStyle: { fontWeight: '600' }, // Default is { fontWeight: 'bold', backgroundColor: '#fff' }
+    rowCellStyle: {  backgroundColor: '#F2EEEE' }, // Default is { backgroundColor: '#fff' }
+    footerCellStyle: { backgroundColor: '#3f51b5', color: 'white' }, // Default is { backgroundColor: '#fff' }
+    showColumns: ['action', 'name', 'calories', 'fat', 'protein'] // No default value 
   };
 
   return( 
