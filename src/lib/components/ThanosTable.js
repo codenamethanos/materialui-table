@@ -20,14 +20,13 @@ const useStyles = makeStyles((theme) => ({
       width: '100%',
       marginBottom: theme.spacing(2),
     },
-    table: {
+    table: options => ({
       minWidth: 750,
       borderCollapse: 'collapse',
-      // CHANGE BELOW
-      // https://stackoverflow.com/questions/53499803/make-table-header-and-first-two-columns-fixed
       whiteSpace: 'nowrap',
-      tableLayout: 'auto'
-    },
+      tableLayout: 'auto',
+      ...options.tableStyle
+    }),
     container: options => ({
       maxHeight: options.maxTableHeight
     }),
@@ -35,16 +34,14 @@ const useStyles = makeStyles((theme) => ({
       fontWeight: 'bold',
       backgroundColor: '#fff',
       ...options.headerCellStyle, 
-      ...(options.stickyHeader && {position: 'sticky', top: 0, zIndex: 100}), 
-      width: options.minCellWidth
+      ...(options.stickyHeader && {position: 'sticky', top: 0, zIndex: 100}) 
     }),
     headerStyleLeftFixed: options => ({
       fontWeight: 'bold',
       backgroundColor: '#fff',
       ...options.headerCellStyle, 
       ...(options.stickyColumn && {position: 'sticky', left: 0, zIndex: 110}),
-      ...(options.stickyHeader && {position: 'sticky', top: 0, zIndex: 110}), 
-      width: options.minCellWidth
+      ...(options.stickyHeader && {position: 'sticky', top: 0, zIndex: 110})
     })
 }));
 
@@ -199,10 +196,12 @@ function ThanosTable({ columns, rows, options }) {
                                   <StyledTableCell cellStyle={(column.columnCellStyle) 
                                                   ? ({backgroundColor: '#fff', ...column.columnCellStyle(row), 
                                                       ...(options.stickyColumn && (leftRow === 1) && {position: 'sticky', left: 0, zIndex: 90}),
-                                                      width: (column.minColWidth || options.minCellWidth)}) 
+                                                      width: column.actionElement ? (options.actionCellWidth || 50) : null, 
+                                                      minWidth: column.minColWidth}) 
                                                   : ({backgroundColor: '#fff', ...options.rowCellStyle, 
                                                       ...(options.stickyColumn && (leftRow === 1) && {position: 'sticky', left: 0, zIndex: 90}),
-                                                      width: (column.minColWidth || options.minCellWidth)})}
+                                                      width: column.actionElement ? (options.actionCellWidth || 50) : null,
+                                                      minWidth: column.minColWidth})}
                                   >
                                     {(!(column.customElement || column.actionElement)) 
                                     ? row[column.key] 
@@ -241,11 +240,13 @@ function ThanosTable({ columns, rows, options }) {
                                                 ? ({backgroundColor: '#fff', ...column.columnCellStyle(totalRow), 
                                                   ...(options.stickyFooter && {position: 'sticky', bottom: 0, zIndex: 100}), 
                                                   ...(options.stickyColumn && (leftFooter === 1) && {position: 'sticky', left: 0, zIndex: 110}),
-                                                  width: (column.minColWidth || options.minCellWidth)}) 
+                                                  width: column.actionElement ? (options.actionCellWidth || 50) : null, 
+                                                  minWidth: column.minColWidth}) 
                                                 : ({backgroundColor: '#fff', ...options.footerCellStyle, 
                                                   ...(options.stickyFooter && {position: 'sticky', bottom: 0, zIndex: 100}), 
                                                   ...(options.stickyColumn && (leftFooter === 1) && {position: 'sticky', left: 0, zIndex: 110}),
-                                                  width: (column.minColWidth || options.minCellWidth)})}
+                                                  width: column.actionElement ? (options.actionCellWidth || 50) : null, 
+                                                  minWidth: column.minColWidth})}
                                 >
                                   {(column.totalRow) 
                                     ? (column.totalRowCellName

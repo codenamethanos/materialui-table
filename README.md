@@ -3,56 +3,135 @@ A library of React components for a light React Datatable using materialui.
 Run the following command: `npm install thanos-datatable`
 
 ## Options
-| Key                           | Value Type (Default)          | Description                   |
-| ----------------------------- | ----------------------------- | ----------------------------- |
-| title                         | String                        | 'My Table'                    |
-| defaultPage                   | String                        | 'My Table'                    |
-| defaultRowsPerPage            | String                        | 'My Table'                    |
-| pageOptions                   | String                        | 'My Table'                    |
-| stickyHeader                  | String                        | 'My Table'                    |
-| stickyFooter                  | String                        | 'My Table'                    |
-| stickyColumn                  | String                        | 'My Table'                    |
-| showEmptyRows                 | String                        | 'My Table'                    |
-| totalRow                      | String                        | 'My Table'                    |
-| maxTableHeight                | String                        | 'My Table'                    |
-| minCellWidth                  | String                        | 'My Table'                    |
-| headerCellStyle               | String                        | 'My Table'                    |
-| rowCellStyle                  | String                        | 'My Table'                    |
-| footerCellStyle               | String                        | 'My Table'                    |
+| Key                           | Value Type (Default)          | Description                                                     |
+| ----------------------------- | ----------------------------- | --------------------------------------------------------------- |
+| title                         | String ( '' )                 | Title of table                                                  |
+| defaultPage                   | Integer ( 0 )                 | Default page to load during initial render                      |
+| defaultRowsPerPage            | Integer ( 5 )                 | Default number of rows per page                                 |
+| pageOptions                   | Array ( [5, 10, 25] )         | Page options dropdown                                           |
+| stickyHeader                  | Boolean ( false )             | Make header sticky                                              |
+| stickyFooter                  | Boolean ( false )             | Make footer sticky                                              |
+| stickyColumn                  | Boolean ( false )             | If true, leftmost column that is not an action will be stickied |
+| showEmptyRows                 | Boolean ( false )             | Show or hide empty rows on last page                            |
+| totalRow                      | Boolean ( true )              | Show or hide total row at the footer                            |
+| maxTableHeight                | Integer ( No default value )  | Max height of the table                                         |
+| actionCellWidth               | Integer ( 50 )                | Width of action column. This looks better when thin like 50     |
+| headerCellStyle               | Style Object                  | Style header cells to your wish. Default style given below      |
+| rowCellStyle                  | Style Object                  | Style row cells to your wish. Default style given below         |
+| footerCellStyle               | Style Object                  | Style footer cells to your wish. Default style given below      |
+| tableStyle                    | Style Object                  | Apply CSS to main table element. Default CSS given below        |
+| showColumns                   | Array ( [] )                  | Check below for example                                         |
+
+
+### headerCellStyle Default Value
+```
+{ fontWeight: 'bold', backgroundColor: '#fff' }
+```
+### rowCellStyle Default Value
+```
+{ backgroundColor: '#fff' }
+```
+### footerCellStyle Default Value
+```
+{ backgroundColor: '#fff' }
+```
+### tableStyle Default Value
+```
+{ minWidth: 750, borderCollapse: 'collapse', whiteSpace: 'nowrap', tableLayout: 'auto' }
+```
+### showColumns Example
+Default value is null or [] which means all columns are visible. Usage Example: 
+```
+['action1', 'action2', 'name', 'calories', 'fat', 'carbs', 'protein', 'button', 'img', 'weight', 'carbs3', 'protein3']
+```
+
 
 ## Columns
-| Key                           | Value Type (Default)          | Description                   |
-| ----------------------------- | ----------------------------- | ----------------------------- |
-| key                           | String                        | 'My Table'                    |
-| title                         | String                        | 'My Table'                    |
-| defaultSort                   | String                        | 'My Table'                    |
-| totalRowCellName              | String                        | 'My Table'                    |
-| minColWidth                   | String                        | 'My Table'                    |
-| totalRow                      | String                        | 'My Table'                    |
-| footerStylePriority           | String                        | 'My Table'                    |
-| customElement                 | String                        | 'My Table'                    |
-| customSort                    | String                        | 'My Table'                    |
-| columnCellStyle               | String                        | 'My Table'                    |
+| Key                           | Value Type (Default)          | Description                                            |
+| ----------------------------- | ----------------------------- | ------------------------------------------------------ |
+| key                           | String ( No default value )   | Mandatory. Should be unique.                           |
+| title                         | String ( No default value )   | Title of column.                                       |
+| defaultSort                   | 'asc' or 'desc' (No default..)| Default column to sort.                                |
+| minColWidth                   | Integer ( No default value )  | Minimum width of column                                |
+| totalRow                      | Boolean ( false )             | Make total row visible at the footer.                  |
+| totalRowCellName              | String  ( No default value )  | Name total row cell with a string instead of summation.|
+| customElement                 | Any React Element ( No defa..)| 'row' is available as parameter. See example below.    |
+| customSort                    | String / Number ( No defaul..)| 'row' is available as parameter. See example below.    |
+| columnCellStyle               | Style Object ( No default..)  | 'row' is available as parameter. See example below.    |
+| actionElement                 | Style Object ( No default..)  | 'row' is available as parameter. See example below.    |
+| footerStylePriority           | Object ( No default value )   | 'row' is available as parameter. See example below.    |
+
+
+### customElement Example 1
+```
+customElement: function(row) { 
+  return <div>{(row.fat + row.carbs + row.protein).toFixed(2)}</div>; 
+},
+```
+### customElement Example 2
+```
+customElement: function(row) {
+  return(
+    <Button variant="contained" size="small" fullWidth={true} >
+      {row.name}
+    </Button>
+  );
+}
+```
+### customSort Example
+```
+customSort: function(row) { 
+  return (row.fat + row.carbs + row.protein); 
+}
+```
+### columnCellStyle Example
+```
+columnCellStyle: function(row) {
+  if(row.fat + row.carbs + row.protein > 50) 
+    return { backgroundColor: '#006B1E', color: '#FFF' };
+  else 
+    return { backgroundColor: '#B00020', color: '#FFF' };;
+}
+```
+### actionElement Example
+actionElement has row as parameter. Also, it accepts an object with icon, toolTip, disabled, color and onClick values.
+onClick has row and event parameter available for you.
+```
+actionElement: function(row) {
+  return({
+    icon: <AddIcon />,
+    toolTip: 'Add Item',
+    disabled: false,
+    color: 'primary',
+    onClick: function(row, event) {
+      alert("Added " + row.name);
+    }
+  });
+}
+```
+
+## Some Info about columns ...
+- key is mandatory. Each key should be unique. 
+- key should match row keys for normal row values, and can be anything unique for custom values.
+- title is not mandatory. It is used to name column headers, so it is recommended. 
+- If there are multiple defaultSort, last one takes preference.
+- In customSort: Return numerical value if you want column sorted numerically.
+- In customSort: Return string if you want column sorted alphabetically.
+- totalRowCellName and totalRow cant be displayed together. If both values are given totalRowCellName takes preference.
+- totalRow of customElement is also computed by the same equation returned in customElement.
+- columnCellStyle can be made to have lower/higher priority than footerCellStyle using footerStylePriority. Default is higher. 
+- If actionElement exist, then the column is treated as an action. Also customElement and title wont work.
 
 ## Example Code
-
 ```
 import React from "react"; 
-import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button'; 
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
-import ThanosTable from "../lib";
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    // height: '100%'
-  }
-}));
+import ThanosTable from "thanos-datatable";
 
 function App() {
 
-  const classes = useStyles();
   function createData(name, calories, fat, carbs, protein, calories2, fat2, carbs2, protein2, calories3, fat3, carbs3, protein3) {
     return { name, calories, fat, carbs, protein, calories2, fat2, carbs2, protein2, calories3, fat3, carbs3, protein3 };
   }
@@ -72,31 +151,6 @@ function App() {
     createData('Nougat', 360, 19.0, 9, 37.0, 360, 19.0, 9, 37.0, 360, 19.0, 9, 37.0),
     createData('Oreo', 437, 18.0, 63, 4.0, 437, 18.0, 63, 4.0, 437, 18.0, 63, 4.0),
   ];
-
-  // SOME INFO
-  // key is mandatory. Each key should be unique. 
-  // It should match row keys for normal row values, and can be anything for custom values.
-  // title is not mandatory. It is used to name column headers.So it is recommended. 
-  // If there are multiple defaultSort, last one takes preference.
-  // In customSort: Return numerical value if you want sorted numerically.
-  // In customSort: Return string if you want sorted alphabetically.
-  // totalRowCellName and totalRow cant be displayed together. If it happens, totalRowCellName takes preference.
-  // totalRow of customElement is also computed by the same equation returned in customElement.
-  // columnCellStyle can be made to have lower/higher priority than footerCellStyle using footerStylePriority. Default is higher. 
-  // If actionElement exist, then the column is treated as an action. Also customElement and title wont work.
-  // minColWidth has higher priority than minCellWidth
-
-  // COLUMNS DEFAULT VALUES
-  // key - Compulsary. No default value
-  // title - No default value
-  // totalRow - Default value is false
-  // totalRowCellName - No default value
-  // actionElement - No default value
-  // customElement - No default value
-  // columnCellStyle - - No default value
-  // footerStylePriority - Default value is false
-  // defaultSort - No default value
-  // customSort - No default value
 
   const columns = [
     { key: 'action1', 
@@ -139,7 +193,7 @@ function App() {
       title: 'Dessert (100g serving)', 
       totalRow: true,
       totalRowCellName: 'Total', 
-      // minColWidth: 300,
+      minColWidth: 300,
       columnCellStyle: function(row) {
           return { backgroundColor: '#03DAC5', color: '#000' };
       },
@@ -151,10 +205,9 @@ function App() {
     { key: 'protein', title: 'Protein', totalRow: true },
     { key: 'button',  
       title: 'Button',
-      // minColWidth: 300,
       customElement: function(row) {
         return(
-          <Button className={classes.root} variant="contained" size="small" fullWidth={true} >
+          <Button variant="contained" size="small" fullWidth={true} >
             {row.name}
           </Button>
         );
@@ -166,7 +219,6 @@ function App() {
     }, 
     { key: 'img', 
       title: 'Image',
-      // minColWidth: 300,
       customElement: function(row) {
         return(
           <img alt='bannera' src={'https://allpiki.ru/wp-content/uploads/2020/01/1579269254_korzik_net_u-1-300x210.jpg'} style={{ width: 50, borderRadius: '10%' }} />
@@ -201,23 +253,24 @@ function App() {
   ];
   
   const options = {
-    title: 'Thanos Table', // Default is ''
-    defaultPage: 0, // Default is 0
-    defaultRowsPerPage: 5, // Default is 5
-    pageOptions: [5, 10, 25, 50], // Default is [5, 10, 25]
-    stickyHeader: true, // Default is false
-    stickyFooter: true, // Default is false
-    stickyColumn: true, // Default is false. If true, leftmost column that is not an action will be stickied.
-    showEmptyRows: false, // Default is false
-    totalRow: true, // Default is true
-    maxTableHeight: 640, // No default value
-    // minCellWidth: 200, // No default value
-    headerCellStyle: { fontWeight: '600', backgroundColor: '#FFF', color: '#000' }, // Default is { fontWeight: 'bold', backgroundColor: '#fff' }
-    rowCellStyle: {  backgroundColor: '#F6F6F6' }, // Default is { backgroundColor: '#fff' }
-    footerCellStyle: { backgroundColor: '#3F51B5', color: '#FFF' }, // Default is { backgroundColor: '#fff' }
-    showColumns: [] // Default value is null or [] which means all columns are visible. 
-                    // Usage example: ['action1', 'action2', 'name', 'calories', 'fat', 'carbs', 'protein', 'button', 'img',
-                    // 'weight', 'calories2', 'fat2', 'carbs2', 'protein2', 'calories3', 'fat3', 'carbs3', 'protein3'] 
+    title: 'Thanos Table', 
+    defaultPage: 0, 
+    defaultRowsPerPage: 5, 
+    pageOptions: [5, 10, 25, 50], 
+    stickyHeader: true, 
+    stickyFooter: true, 
+    stickyColumn: true, 
+    showEmptyRows: false, 
+    totalRow: true, 
+    maxTableHeight: 640, 
+    actionCellWidth: 60, 
+    headerCellStyle: { fontWeight: '600', backgroundColor: '#FFF', color: '#000', textAlign: 'center' },  
+    rowCellStyle: {  backgroundColor: '#F6F6F6' },
+    footerCellStyle: { backgroundColor: '#3F51B5', color: '#FFF' }, 
+    tableStyle: { minWidth: 760 }, 
+    showColumns: []   
+    // showColumns full list: ['action1', 'action2', 'name', 'calories', 'fat', 'carbs', 'protein', 'button', 'img',
+    // 'weight', 'calories2', 'fat2', 'carbs2', 'protein2', 'calories3', 'fat3', 'carbs3', 'protein3'] 
   };
 
   return( 
@@ -228,4 +281,5 @@ function App() {
 }
 
 export default App;
+
 ```

@@ -66,13 +66,13 @@ var useStyles = (0, _styles.makeStyles)(function (theme) {
       width: '100%',
       marginBottom: theme.spacing(2)
     },
-    table: {
-      minWidth: 750,
-      borderCollapse: 'collapse',
-      // CHANGE BELOW
-      // https://stackoverflow.com/questions/53499803/make-table-header-and-first-two-columns-fixed
-      whiteSpace: 'nowrap',
-      tableLayout: 'auto'
+    table: function table(options) {
+      return _objectSpread({
+        minWidth: 750,
+        borderCollapse: 'collapse',
+        whiteSpace: 'nowrap',
+        tableLayout: 'auto'
+      }, options.tableStyle);
     },
     container: function container(options) {
       return {
@@ -87,8 +87,6 @@ var useStyles = (0, _styles.makeStyles)(function (theme) {
         position: 'sticky',
         top: 0,
         zIndex: 100
-      }, {
-        width: options.minCellWidth
       });
     },
     headerStyleLeftFixed: function headerStyleLeftFixed(options) {
@@ -103,8 +101,6 @@ var useStyles = (0, _styles.makeStyles)(function (theme) {
         position: 'sticky',
         top: 0,
         zIndex: 110
-      }, {
-        width: options.minCellWidth
       });
     }
   };
@@ -300,7 +296,8 @@ function ThanosTable(_ref2) {
           left: 0,
           zIndex: 90
         }, {
-          width: column.minColWidth || options.minCellWidth
+          width: column.actionElement ? options.actionCellWidth || 50 : null,
+          minWidth: column.minColWidth
         }) : _objectSpread({
           backgroundColor: '#fff'
         }, options.rowCellStyle, {}, options.stickyColumn && leftRow === 1 && {
@@ -308,7 +305,8 @@ function ThanosTable(_ref2) {
           left: 0,
           zIndex: 90
         }, {
-          width: column.minColWidth || options.minCellWidth
+          width: column.actionElement ? options.actionCellWidth || 50 : null,
+          minWidth: column.minColWidth
         })
       }, !(column.customElement || column.actionElement) ? row[column.key] : column.actionElement ? /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
         title: currentActionElement.toolTip
@@ -342,7 +340,8 @@ function ThanosTable(_ref2) {
         left: 0,
         zIndex: 110
       }, {
-        width: column.minColWidth || options.minCellWidth
+        width: column.actionElement ? options.actionCellWidth || 50 : null,
+        minWidth: column.minColWidth
       }) : _objectSpread({
         backgroundColor: '#fff'
       }, options.footerCellStyle, {}, options.stickyFooter && {
@@ -354,7 +353,8 @@ function ThanosTable(_ref2) {
         left: 0,
         zIndex: 110
       }, {
-        width: column.minColWidth || options.minCellWidth
+        width: column.actionElement ? options.actionCellWidth || 50 : null,
+        minWidth: column.minColWidth
       })
     }, column.totalRow ? column.totalRowCellName ? column.totalRowCellName : column.customElement ? column.customElement(totalRow) : totalRow[column.key] : null);
   }) : null)))), /*#__PURE__*/_react.default.createElement(_TablePagination.default, {
