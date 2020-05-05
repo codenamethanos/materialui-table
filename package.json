@@ -8,8 +8,8 @@
     "type": "git",
     "url": "codenamethanos/materialui-table"
   },
-  "main": "dist/index.js",
-  "module": "dist/index.js",
+  "main": "dist/index",
+  "module": "dist/index",
   "files": [
     "dist",
     "README.md"
