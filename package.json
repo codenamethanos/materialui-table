@@ -1,6 +1,6 @@
 {
   "name": "thanos-datatable",
-  "version": "1.6.2",
+  "version": "1.6.1",
   "description": "A datatable using materialui",
   "author": "codenamethanos",
   "license": "MIT",
@@ -16,9 +16,7 @@
   ],
   "peerDependencies": {
     "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "@material-ui/core": "^4.9.12",
-    "@material-ui/icons": "^4.9.1"
+    "react-dom": "^16.13.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
@@ -28,13 +26,14 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
-    "@material-ui/core": "^4.9.12",
-    "@material-ui/icons": "^4.9.1",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@material-ui/core": "^4.9.12",
+    "@material-ui/icons": "^4.9.1"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "rm -rf dist && npx babel src/lib --out-dir dist --copy-files",
