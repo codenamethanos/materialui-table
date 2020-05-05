@@ -120,6 +120,7 @@ actionElement: function(row) {
 - In customSort: Return string if you want column sorted alphabetically.
 - totalRowCellName and totalRow cant be displayed together. If both values are given totalRowCellName takes preference.
 - totalRow of customElement is also computed by the same equation returned in customElement.
+- columnCellStyle has higher priority than rowCellStyle.
 - columnCellStyle can be made to have lower/higher priority than footerCellStyle using footerStylePriority. Default is higher. 
 - If actionElement exist, then the column is treated as an action. Also customElement and title wont work.
 
