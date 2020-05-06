@@ -248,14 +248,10 @@ function ThanosTable(_ref2) {
     if (withDefaultOptions.totalRow) {
       for (var _i2 = 0, n1 = sortedFirstPageRow.length; _i2 < n1; _i2++) {
         for (var j = 0, n2 = columns.length; j < n2; j++) {
-          if (!columns[j].customElement || !columns[j].actionElement) {
-            value = 0;
-            value = Number(sortedFirstPageRow[_i2][columns[j].key]) || 0;
-            totalRow[columns[j]['key']] = totalRow[columns[j]['key']] ? totalRow[columns[j]['key']] + value : value;
-            if (_i2 === n1 - 1) totalRow[columns[j]['key']] = Math.round(totalRow[columns[j]['key']] * 1e12) / 1e12; // Math.round((totalRow[columns[j].key]) * 1e12) / 1e12 ... is used to protect against floating point decimal issue. (https://stackoverflow.com/questions/10473994/javascript-adding-decimal-numbers-issue)
-          } else {
-            if (_i2 === 0) totalRow[columns[j]['key']] = 0;
-          }
+          value = 0;
+          value = Number(sortedFirstPageRow[_i2][columns[j].key]) || 0;
+          totalRow[columns[j]['key']] = totalRow[columns[j]['key']] ? totalRow[columns[j]['key']] + value : value;
+          if (_i2 === n1 - 1) totalRow[columns[j]['key']] = Math.round(totalRow[columns[j]['key']] * 1e12) / 1e12; // Math.round((totalRow[columns[j].key]) * 1e12) / 1e12 ... is used to protect against floating point decimal issue. (https://stackoverflow.com/questions/10473994/javascript-adding-decimal-numbers-issue)
         }
       }
     }
@@ -356,7 +352,8 @@ function ThanosTable(_ref2) {
         width: column.actionElement ? options.actionCellWidth || 50 : null,
         minWidth: column.minColWidth
       })
-    }, column.totalRow ? column.totalRowCellName ? column.totalRowCellName : column.customElement ? column.customElement(totalRow) : totalRow[column.key] : null);
+    }, column.totalRow && Object.keys(totalRow).length ? // To prevent error if totalRow is empty. Happens if row is yet to load
+    column.totalRowCellName ? column.totalRowCellName : column.customElement ? column.customElement(totalRow) : totalRow[column.key] : null);
   }) : null)))), /*#__PURE__*/_react.default.createElement(_TablePagination.default, {
     rowsPerPageOptions: options.pageOptions || [5, 10, 25],
     component: "div",

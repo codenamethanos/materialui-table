@@ -101,6 +101,10 @@ function ThanosTableToolbar({ title, columns, visibleColumns, onColumnChange }) 
                     <Typography style={{fontWeight: 'bold'}} align="center">Add Or Remove Columns</Typography> 
                     <List className={classes.root}> 
                         {columns.map(column => {
+                            console.log("ABRA");
+                            console.log(checked);
+                            console.log(checked.indexOf(column));
+                            console.log(column);
                             const labelId = `checkbox-list-label-${column.key}`;
                             return (
                               <ListItem key={column.key} role={undefined} dense button onClick={handleToggle(column)}>

@@ -148,14 +148,10 @@ function ThanosTable({ columns, rows, options }) {
     if(withDefaultOptions.totalRow) {
       for(let i=0, n1=sortedFirstPageRow.length; i<n1; i++) {
         for(let j=0, n2=columns.length; j<n2; j++) {
-          if(!columns[j].customElement || !columns[j].actionElement) {
-            value = 0;
-            value = Number(sortedFirstPageRow[i][columns[j].key]) || 0; 
-            totalRow[columns[j]['key']] = (totalRow[columns[j]['key']] ? (totalRow[columns[j]['key']] + value) : value);
-            if(i === (n1-1)) totalRow[columns[j]['key']] = Math.round((totalRow[columns[j]['key']]) * 1e12) / 1e12 // Math.round((totalRow[columns[j].key]) * 1e12) / 1e12 ... is used to protect against floating point decimal issue. (https://stackoverflow.com/questions/10473994/javascript-adding-decimal-numbers-issue)
-          } else {
-            if(i === 0) totalRow[columns[j]['key']] = 0; 
-          }
+          value = 0;
+          value = Number(sortedFirstPageRow[i][columns[j].key]) || 0; 
+          totalRow[columns[j]['key']] = (totalRow[columns[j]['key']] ? (totalRow[columns[j]['key']] + value) : value);
+          if(i === (n1-1)) totalRow[columns[j]['key']] = Math.round((totalRow[columns[j]['key']]) * 1e12) / 1e12 // Math.round((totalRow[columns[j].key]) * 1e12) / 1e12 ... is used to protect against floating point decimal issue. (https://stackoverflow.com/questions/10473994/javascript-adding-decimal-numbers-issue)
         } 
       }
     }
@@ -248,7 +244,7 @@ function ThanosTable({ columns, rows, options }) {
                                                   width: column.actionElement ? (options.actionCellWidth || 50) : null, 
                                                   minWidth: column.minColWidth})}
                                 >
-                                  {(column.totalRow) 
+                                  {(column.totalRow && Object.keys(totalRow).length) // To prevent error if totalRow is empty. Happens if row is yet to load
                                     ? (column.totalRowCellName
                                       ? column.totalRowCellName 
                                       : (column.customElement 

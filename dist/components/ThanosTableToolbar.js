@@ -180,6 +180,10 @@ function ThanosTableToolbar(_ref) {
   }, "Add Or Remove Columns"), /*#__PURE__*/_react.default.createElement(_List.default, {
     className: classes.root
   }, columns.map(function (column) {
+    console.log("ABRA");
+    console.log(checked);
+    console.log(checked.indexOf(column));
+    console.log(column);
     var labelId = "checkbox-list-label-".concat(column.key);
     return /*#__PURE__*/_react.default.createElement(_ListItem.default, {
       key: column.key,
